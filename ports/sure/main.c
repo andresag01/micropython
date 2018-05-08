@@ -8,8 +8,30 @@
 #include "py/repl.h"
 #include "py/mperrno.h"
 
-void do_str(const char *src, mp_parse_input_kind_t input_kind) {
+#define FORCED_EXIT (0x100)
+// If exc is SystemExit, return value where FORCED_EXIT bit set,
+// and lower 8 bits are SystemExit value. For all other exceptions,
+// return 1.
+STATIC int handle_uncaught_exception(mp_obj_base_t *exc) {
+    // check for SystemExit
+    if (mp_obj_is_subclass_fast(MP_OBJ_FROM_PTR(exc->type), MP_OBJ_FROM_PTR(&mp_type_SystemExit))) {
+        // None is an exit value of 0; an int is its value; anything else is 1
+        mp_obj_t exit_val = mp_obj_exception_get_value(MP_OBJ_FROM_PTR(exc));
+        mp_int_t val = 0;
+        if (exit_val != mp_const_none && !mp_obj_get_int_maybe(exit_val, &val)) {
+            val = 1;
+        }
+        return FORCED_EXIT | (val & 255);
+    }
+
+    // Report all other exceptions
+    mp_obj_print_exception(&mp_plat_print, MP_OBJ_FROM_PTR(exc));
+    return 1;
+}
+
+STATIC void do_str(const char *src, mp_parse_input_kind_t input_kind) {
     nlr_buf_t nlr;
+    int ret;
     if (nlr_push(&nlr) == 0) {
         mp_lexer_t *lex = mp_lexer_new_from_str_len(MP_QSTR__lt_stdin_gt_, src, strlen(src), 0);
         qstr source_name = lex->source_name;
@@ -19,16 +41,28 @@ void do_str(const char *src, mp_parse_input_kind_t input_kind) {
         nlr_pop();
     } else {
         // uncaught exception
-        mp_obj_print_exception(&mp_plat_print, (mp_obj_t)nlr.ret_val);
+        ret = handle_uncaught_exception(nlr.ret_val);
+        if (ret == 1)
+        {
+            // Real uncaught exception
+        }
+        else
+        {
+            // System exit returned something
+            printf("Sytem returned 0x%04X\n", ret);
+        }
     }
 }
 
 int main(void)
 {
     mp_init();
+    do_str("import sys", MP_PARSE_SINGLE_INPUT);
     do_str("print('hello world!', list(x+1 for x in range(10)), end='eol\\n')",
         MP_PARSE_SINGLE_INPUT);
     do_str("for i in range(10):\n  print(i)", MP_PARSE_FILE_INPUT);
+    do_str("a = 2 + 2", MP_PARSE_SINGLE_INPUT);
+    do_str("sys.exit(1 if a == 4 else 0)", MP_PARSE_SINGLE_INPUT);
     mp_deinit();
     return 0;
 }
