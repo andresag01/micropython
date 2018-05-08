@@ -1,3 +1,10 @@
+MICROPY_FORCE_32BIT = 1
+MICROPY_PY_TERMIOS = 0
+MICROPY_PY_SOCKET = 0
+MICROPY_PY_THREAD_GIL = 0
+MICROPY_PY_USE_READLINE = 0
+MICROPY_PY_WEBREPL = 0
+
 include ../../py/mkenv.mk
 
 # qstr definitions (must come before including py.mk)
@@ -8,18 +15,11 @@ include $(TOP)/py/py.mk
 
 CROSS_COMPILE =
 
-MICROPY_FORCE_32BIT = 1
-MICROPY_PY_TERMIOS = 0
-MICROPY_PY_SOCKET = 0
-MICROPY_PY_THREAD_GIL = 0
-MICROPY_PY_USE_READLINE = 0
-MICROPY_PY_WEBREPL = 0
-
 INC += -I.
 INC += -I$(TOP)
 INC += -I$(BUILD)
 
-CFLAGS = $(INC) -Wall -Werror -std=c99 -m32 -Wpointer-arith -Wuninitialized \
+CFLAGS = $(INC) -Wall -Werror -std=c99 -Wpointer-arith -Wuninitialized \
 	-O0 -g3 -fdata-sections -ffunction-sections -DNDEBUG \
 	-DMICROPY_USE_READLINE=$(MICROPY_PY_USE_READLINE) \
 	-DMICROPY_PY_SOCKET=$(MICROPY_PY_SOCKET) \
