@@ -34,7 +34,7 @@
 #include "py/bc.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
-#define DEBUG_printf DEBUG_printf
+#define DEBUG_printf printf
 #else // don't print debugging info
 #define DEBUG_printf(...) (void)0
 #endif

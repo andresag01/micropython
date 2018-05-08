@@ -4,7 +4,7 @@
 #define MICROPY_GC_ALLOC_THRESHOLD          (0)
 #define MICROPY_ALLOC_PATH_MAX              (512)
 #define MICROPY_MODULE_DICT_SIZE            (1)
-#define MICROPY_MALLOC_USES_ALLOCATED_SIZE  (0)
+#define MICROPY_MALLOC_USES_ALLOCATED_SIZE  (1)
 #define MICROPY_QSTR_BYTES_IN_LEN           (1)
 #define MICROPY_QSTR_BYTES_IN_HASH          (1)
 #define MICROPY_STACKLESS                   (0)
@@ -31,10 +31,10 @@
 #define MICROPY_COMP_TRIPLE_TUPLE_ASSIGN    (0)
 #define MICROPY_COMP_RETURN_IF_EXPR         (0)
 
-#define MICROPY_MEM_STATS                   (0)
+#define MICROPY_MEM_STATS                   (1)
 
-#define MICROPY_DEBUG_PRINTERS              (0)
-#define MICROPY_DEBUG_VERBOSE               (0)
+#define MICROPY_DEBUG_PRINTERS              (1)
+#define MICROPY_DEBUG_VERBOSE               (1)
 
 #define MICROPY_OPT_COMPUTED_GOTO                   (0)
 #define MICROPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE    (0)
@@ -171,7 +171,15 @@
 #define MICROPY_PY_BTREE                        (0)
 
 //#define MICROPY_MAKE_POINTER_CALLABLE(p) ((void*)((mp_uint_t)(p) | 1))
-#define MP_PLAT_PRINT_STRN(str, len)            (void)0
+//#define MP_PLAT_PRINT_STRN(str, len)            (void)0
+#define MP_PLAT_PRINT_STRN(str, len)    \
+    {                                   \
+        size_t i;                       \
+        for (i = 0; i < len; i++)       \
+        {                               \
+            printf("%c", str[i]);       \
+        }                               \
+    }
 
 typedef int32_t mp_int_t; // must be pointer size
 typedef uint32_t mp_uint_t; // must be pointer size

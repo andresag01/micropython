@@ -33,7 +33,7 @@
 #include "py/mpstate.h"
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
-#define DEBUG_printf DEBUG_printf
+#define DEBUG_printf printf
 #else // don't print debugging info
 #define DEBUG_printf(...) (void)0
 #endif
@@ -81,7 +81,7 @@ void *m_malloc(size_t num_bytes) {
     MP_STATE_MEM(current_bytes_allocated) += num_bytes;
     UPDATE_PEAK();
 #endif
-    DEBUG_printf("malloc %d : %p\n", num_bytes, ptr);
+    DEBUG_printf("%s %d : %p\n", __func__, num_bytes, ptr);
     return ptr;
 }
 
@@ -92,7 +92,7 @@ void *m_malloc_maybe(size_t num_bytes) {
     MP_STATE_MEM(current_bytes_allocated) += num_bytes;
     UPDATE_PEAK();
 #endif
-    DEBUG_printf("malloc %d : %p\n", num_bytes, ptr);
+    DEBUG_printf("%s %d : %p\n", __func__, num_bytes, ptr);
     return ptr;
 }
 
@@ -107,7 +107,7 @@ void *m_malloc_with_finaliser(size_t num_bytes) {
     MP_STATE_MEM(current_bytes_allocated) += num_bytes;
     UPDATE_PEAK();
 #endif
-    DEBUG_printf("malloc %d : %p\n", num_bytes, ptr);
+    DEBUG_printf("%s %d : %p\n", __func__, num_bytes, ptr);
     return ptr;
 }
 #endif
@@ -144,7 +144,7 @@ void *m_realloc(void *ptr, size_t new_num_bytes) {
     MP_STATE_MEM(current_bytes_allocated) += diff;
     UPDATE_PEAK();
 #endif
-    DEBUG_printf("realloc %p, %d, %d : %p\n", ptr, old_num_bytes, new_num_bytes, new_ptr);
+    DEBUG_printf("%s %p, %d, %d : %p\n", __func__, ptr, old_num_bytes, new_num_bytes, new_ptr);
     return new_ptr;
 }
 
@@ -168,7 +168,7 @@ void *m_realloc_maybe(void *ptr, size_t new_num_bytes, bool allow_move) {
         UPDATE_PEAK();
     }
 #endif
-    DEBUG_printf("realloc %p, %d, %d : %p\n", ptr, old_num_bytes, new_num_bytes, new_ptr);
+    DEBUG_printf("%s %p, %d, %d : %p\n", __func__, ptr, old_num_bytes, new_num_bytes, new_ptr);
     return new_ptr;
 }
 
@@ -181,7 +181,7 @@ void m_free(void *ptr) {
 #if MICROPY_MEM_STATS
     MP_STATE_MEM(current_bytes_allocated) -= num_bytes;
 #endif
-    DEBUG_printf("free %p, %d\n", ptr, num_bytes);
+    DEBUG_printf("%s %p, %d\n", __func__, ptr, num_bytes);
 }
 
 #if MICROPY_MEM_STATS
