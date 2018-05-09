@@ -11,9 +11,9 @@
 #define MICROPY_STACKLESS_STRICT            (0)
 #define MICROPY_NO_ALLOCA                   (1)
 
-#define MICROPY_EMIT_X64                    (1)
+#define MICROPY_EMIT_X64                    (0)
 #define MICROPY_EMIT_X86                    (0)
-#define MICROPY_EMIT_THUMB                  (0)
+#define MICROPY_EMIT_THUMB                  (1)
 #define MICROPY_EMIT_INLINE_THUMB           (0)
 #define MICROPY_EMIT_INLINE_THUMB_ARMV7M    (0)
 #define MICROPY_EMIT_INLINE_THUMB_FLOAT     (0)
@@ -33,8 +33,8 @@
 
 #define MICROPY_MEM_STATS                   (1)
 
-#define MICROPY_DEBUG_PRINTERS              (1)
-#define MICROPY_DEBUG_VERBOSE               (1)
+#define MICROPY_DEBUG_PRINTERS              (0)
+#define MICROPY_DEBUG_VERBOSE               (0)
 
 #define MICROPY_OPT_COMPUTED_GOTO                   (0)
 #define MICROPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE    (0)
@@ -172,15 +172,15 @@
 #define MICROPY_PY_BTREE                        (0)
 
 //#define MICROPY_MAKE_POINTER_CALLABLE(p) ((void*)((mp_uint_t)(p) | 1))
-//#define MP_PLAT_PRINT_STRN(str, len)            (void)0
-#define MP_PLAT_PRINT_STRN(str, len)    \
+#define MP_PLAT_PRINT_STRN(str, len)            (void)0
+/*#define MP_PLAT_PRINT_STRN(str, len)    \
     {                                   \
         size_t i;                       \
         for (i = 0; i < len; i++)       \
         {                               \
             printf("%c", str[i]);       \
         }                               \
-    }
+    }*/
 
 typedef int32_t mp_int_t; // must be pointer size
 typedef uint32_t mp_uint_t; // must be pointer size

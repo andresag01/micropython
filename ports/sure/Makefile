@@ -1,4 +1,4 @@
-MICROPY_FORCE_32BIT = 1
+MICROPY_FORCE_32BIT = 0
 MICROPY_PY_TERMIOS = 0
 MICROPY_PY_SOCKET = 0
 MICROPY_PY_THREAD_GIL = 0
@@ -13,23 +13,28 @@ QSTR_DEFS = qstrdefsport.h
 # include py core make definitions
 include $(TOP)/py/py.mk
 
-CROSS_COMPILE =
-
 INC += -I.
 INC += -I$(TOP)
 INC += -I$(BUILD)
 
-CFLAGS = $(INC) -Wall -Werror -std=c99 -Wpointer-arith -Wuninitialized \
-	-O0 -g3 -fdata-sections -ffunction-sections -DNDEBUG \
+LDSCRIPT = memmap.ld
+SYSROOT = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/lib/clang/7.0.0/include
+
+CFLAGS = $(INC) --sysroot $(SYSROOT) --target=thumb -O2 -Wall -emit-llvm \
+	-nostdlib -ffreestanding -mfloat-abi=soft \
+	-ffunction-sections -fdata-sections -fno-builtin -fno-stack-protector \
+	-momit-leaf-frame-pointer -DNDEBUG \
 	-DMICROPY_USE_READLINE=$(MICROPY_PY_USE_READLINE) \
 	-DMICROPY_PY_SOCKET=$(MICROPY_PY_SOCKET) \
 	-DMICROPY_PY_THREAD_GIL=$(MICROPY_PY_THREAD_GIL) \
 	-DMICROPY_PY_WEBREPL=$(MICROPY_PY_WEBREPL)
+LLCFLAGS = -march=thumb -function-sections -data-sections \
+	-disable-simplify-libcalls -mtriple=arm-non-eabi
+LDFLAGS = -nostdlib -static --gc-sections -T $(LDSCRIPT)
+ASFLAGS = -mthumb
 
-LDFLAGS = #-Wl,-map,$@.map -Wl,-dead_strip
-
-SRC_C = main.c
-SRC_S =
+SRC_C = main.c sbrk.c dlmalloc.c
+SRC_S = startup.asm
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o) $(SRC_S:.s=.o))
 

@@ -32,7 +32,8 @@ $(BUILD)/%.o: %.s
 
 define compile_c
 $(ECHO) "CC $<"
-$(Q)$(CC) $(CFLAGS) -c -MD -o $@ $<
+$(Q)$(CC) $(CFLAGS) -c -MD -o $(@:.o=.bc) $<
+$(Q)$(LLC) $(LLCFLAGS) -filetype=obj $(@:.o=.bc) -o $@
 @# The following fixes the dependency file.
 @# See http://make.paulandlesley.org/autodep.html for details.
 @# Regex adjusted from the above to play better with Windows paths, etc.
@@ -70,16 +71,16 @@ $(BUILD)/%.pp: %.c
 $(OBJ): | $(HEADER_BUILD)/qstrdefs.generated.h $(HEADER_BUILD)/mpversion.h
 
 $(HEADER_BUILD)/qstr.i.last: $(SRC_QSTR) | $(HEADER_BUILD)/mpversion.h
-	$(ECHO) "GEN $@"
+	$(ECHO) "GEN 1 $@"
 	$(Q)$(CPP) $(QSTR_GEN_EXTRA_CFLAGS) $(CFLAGS) $(if $?,$?,$^) >$(HEADER_BUILD)/qstr.i.last;
 
 $(HEADER_BUILD)/qstr.split: $(HEADER_BUILD)/qstr.i.last
-	$(ECHO) "GEN $@"
+	$(ECHO) "GEN 2 $@"
 	$(Q)$(PYTHON) $(PY_SRC)/makeqstrdefs.py split $(HEADER_BUILD)/qstr.i.last $(HEADER_BUILD)/qstr $(QSTR_DEFS_COLLECTED)
 	$(Q)touch $@
 
 $(QSTR_DEFS_COLLECTED): $(HEADER_BUILD)/qstr.split
-	$(ECHO) "GEN $@"
+	$(ECHO) "GEN 3 $@"
 	$(Q)$(PYTHON) $(PY_SRC)/makeqstrdefs.py cat $(HEADER_BUILD)/qstr.i.last $(HEADER_BUILD)/qstr $(QSTR_DEFS_COLLECTED)
 
 # $(sort $(var)) removes duplicates

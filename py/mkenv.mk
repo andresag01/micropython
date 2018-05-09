@@ -44,14 +44,15 @@ MKDIR = mkdir
 SED = sed
 PYTHON = python
 
-AS = $(CROSS_COMPILE)as
-CC = $(CROSS_COMPILE)gcc
-CXX = $(CROSS_COMPILE)g++
-LD = $(CROSS_COMPILE)gcc
-OBJCOPY = $(CROSS_COMPILE)objcopy
-SIZE = $(CROSS_COMPILE)size
-STRIP = $(CROSS_COMPILE)strip
-AR = $(CROSS_COMPILE)ar
+AS = arm-none-eabi-as
+CC = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin/clang
+LLC = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin/llc
+CXX = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin/clang++
+LD = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
+SIZE = arm-none-eabi-size
+STRIP = arm-none-eabi-strip
+AR = arm-none-eabi-ar
 ifeq ($(MICROPY_FORCE_32BIT),1)
 CC += -m32
 CXX += -m32
