@@ -8,7 +8,10 @@
 #include "py/repl.h"
 #include "py/mperrno.h"
 
+#include "script.h"
+
 #define FORCED_EXIT (0x100)
+
 // If exc is SystemExit, return value where FORCED_EXIT bit set,
 // and lower 8 bits are SystemExit value. For all other exceptions,
 // return 1.
@@ -29,7 +32,7 @@ STATIC int handle_uncaught_exception(mp_obj_base_t *exc) {
     return 1;
 }
 
-STATIC void do_str(const char *src, mp_parse_input_kind_t input_kind) {
+STATIC void run_script(const char *src, mp_parse_input_kind_t input_kind) {
     nlr_buf_t nlr;
     int ret;
     if (nlr_push(&nlr) == 0) {
@@ -42,14 +45,12 @@ STATIC void do_str(const char *src, mp_parse_input_kind_t input_kind) {
     } else {
         // uncaught exception
         ret = handle_uncaught_exception(nlr.ret_val);
-        if (ret == 1)
-        {
+        if (ret == 1) {
             // Real uncaught exception
-        }
-        else
-        {
+            printf("Uncaught exception!\n");
+        } else {
             // System exit returned something
-            printf("Sytem returned 0x%04X\n", ret);
+            printf("Sytem returned 0x%04X\n", ret & ~FORCED_EXIT);
         }
     }
 }
@@ -57,12 +58,7 @@ STATIC void do_str(const char *src, mp_parse_input_kind_t input_kind) {
 int main(void)
 {
     mp_init();
-    do_str("import sys", MP_PARSE_SINGLE_INPUT);
-    do_str("print('hello world!', list(x+1 for x in range(10)), end='eol\\n')",
-        MP_PARSE_SINGLE_INPUT);
-    do_str("for i in range(10):\n  print(i)", MP_PARSE_FILE_INPUT);
-    do_str("a = 2 + 2", MP_PARSE_SINGLE_INPUT);
-    do_str("sys.exit(1 if a == 4 else 0)", MP_PARSE_SINGLE_INPUT);
+    run_script(PYTHON_SCRIPT, MP_PARSE_FILE_INPUT);
     mp_deinit();
     return 0;
 }
