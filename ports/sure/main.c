@@ -9,6 +9,7 @@
 #include "py/mperrno.h"
 
 #include "script.h"
+#include "utils.h"
 
 #define FORCED_EXIT (0x100)
 
@@ -48,11 +49,11 @@ STATIC void run_script(const char *src, mp_parse_input_kind_t input_kind) {
         if (ret == 1) {
             // Real uncaught exception
             //printf("Uncaught exception!\n");
-            fail();
+            fail(97);
         } else {
             // System exit returned something
             //printf("Sytem returned 0x%04X\n", ret & ~FORCED_EXIT);
-            fail();
+            fail(96);
         }
     }
 }
@@ -82,10 +83,10 @@ mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs) 
 }
 MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 1, mp_builtin_open);
 
-void nlr_jump_fail(void *val) {
-    exit(98);
+void NORETURN nlr_jump_fail(void *val) {
+    fail(99);
 }
 
 void NORETURN __fatal_error(const char *msg) {
-    exit(99);
+    fail(98);
 }
