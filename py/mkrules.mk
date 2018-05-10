@@ -33,7 +33,10 @@ $(BUILD)/%.o: %.s
 define compile_c
 $(ECHO) "CC $<"
 $(Q)$(CC) $(CFLAGS) -c -MD -o $(@:.o=.bc) $<
+$(ECHO) "LLC (OBJ) $<"
 $(Q)$(LLC) $(LLCFLAGS) -filetype=obj $(@:.o=.bc) -o $@
+$(ECHO) "LLC (ASM) $<"
+$(Q)$(LLC) $(LLCFLAGS) -filetype=asm $(@:.o=.bc) -o $(@:.o=.llvm.asm)
 @# The following fixes the dependency file.
 @# See http://make.paulandlesley.org/autodep.html for details.
 @# Regex adjusted from the above to play better with Windows paths, etc.
@@ -129,7 +132,7 @@ ifneq ($(PROG),)
 all: $(PROG)
 
 $(PROG): $(OBJ)
-	$(ECHO) "LINK $@"
+	$(ECHO) "LINK 1 $@"
 # Do not pass COPT here - it's *C* compiler optimizations. For example,
 # we may want to compile using Thumb, but link with non-Thumb libc.
 	$(Q)$(CC) -o $@ $^ $(LIB) $(LDFLAGS)
@@ -165,6 +168,7 @@ print-cfg:
 	$(ECHO) "PY_SRC = $(PY_SRC)"
 	$(ECHO) "BUILD  = $(BUILD)"
 	$(ECHO) "OBJ    = $(OBJ)"
+	$(ECHO) "PY_O   = $(PY_O)"
 .PHONY: print-cfg
 
 print-def:

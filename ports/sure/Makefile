@@ -18,30 +18,42 @@ INC += -I$(TOP)
 INC += -I$(BUILD)
 
 LDSCRIPT = memmap.ld
-SYSROOT = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/lib/clang/7.0.0/include
+#SYSROOT = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/lib/clang/7.0.0/include
+SYSROOT = /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-none-eabi/include
 
-CFLAGS = $(INC) --sysroot $(SYSROOT) --target=thumb -O2 -Wall -emit-llvm \
-	-nostdlib -ffreestanding -mfloat-abi=soft \
+CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O2 -mcpu=cortex-m0 \
+	--target=thumb -Wall -emit-llvm -nostdlib -ffreestanding -mfloat-abi=soft \
 	-ffunction-sections -fdata-sections -fno-builtin -fno-stack-protector \
 	-momit-leaf-frame-pointer -DNDEBUG \
 	-DMICROPY_USE_READLINE=$(MICROPY_PY_USE_READLINE) \
 	-DMICROPY_PY_SOCKET=$(MICROPY_PY_SOCKET) \
 	-DMICROPY_PY_THREAD_GIL=$(MICROPY_PY_THREAD_GIL) \
 	-DMICROPY_PY_WEBREPL=$(MICROPY_PY_WEBREPL)
-LLCFLAGS = -march=thumb -function-sections -data-sections \
-	-disable-simplify-libcalls -mtriple=arm-non-eabi
-LDFLAGS = -nostdlib -static --gc-sections -T $(LDSCRIPT)
+LLCFLAGS = -mtriple=arm-none-eabi -march=thumb -float-abi=soft \
+	-function-sections -O2 -data-sections -disable-simplify-libcalls
+LDFLAGS = -static -nostdlib --gc-sections -T $(LDSCRIPT) -Map $(@:.elf=.map)
 ASFLAGS = -mthumb
+SIZEFLAGS = --format=sysv --radix=10
+READELFFLAGS ?= -a -teg
+OBJDUMPFLAGS ?= -h -C -S -s -d
 
-SRC_C = main.c sbrk.c dlmalloc.c
-SRC_S = startup.asm
+SRC_C = main.c utils.c dlmalloc.c
+SRC_S = startup.s idiv.s idivmod.s memset.s crt.s
 
-OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o) $(SRC_S:.s=.o))
+OBJ = $(addprefix $(BUILD)/, $(SRC_S:.s=.o) $(SRC_C:.c=.o)) $(PY_O)
 
-all: $(BUILD)/upython
+all: $(BUILD)/micropython.elf
 
-$(BUILD)/upython: $(OBJ)
+$(BUILD)/micropython.elf: $(OBJ)
 	$(ECHO) "LINK $@"
-	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(Q)$(LD) $(LDFLAGS) -o $@ $^
+	$(ECHO) "OBJCOPY $@"
+	$(Q)$(OBJCOPY) $@ -O binary $(@:.elf=.bin)
+	$(ECHO) "SIZE $@"
+	$(Q)$(SIZE) $(SIZEFLAGS) $@ > $(@:.elf=.size)
+	$(ECHO) "RELF $@"
+	$(Q)$(READELF) $(READELFFLAGS) $@ > $(@:.elf=.readelf)
+	$(ECHO) "OBJDUMP $@"
+	$(Q)$(OBJDUMP) $(OBJDUMPFLAGS) $@ > $(@:.elf=.objdump)
 
 include $(TOP)/py/mkrules.mk

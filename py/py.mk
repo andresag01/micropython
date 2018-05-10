@@ -308,6 +308,15 @@ $(PY_BUILD)/emitnxtensa.o: CFLAGS += -DN_XTENSA
 $(PY_BUILD)/emitnxtensa.o: py/emitnative.c
 	$(call compile_c)
 
+$(PY_BUILD)/nlrthumb.o: py/nlrthumb.c
+	$(Q)arm-none-eabi-gcc $(INC) -nostdlib -isystem $(SYSROOT) \
+		--sysroot $(SYSROOT) -Os -mcpu=cortex-m0 -mthumb -Wall -ffreestanding \
+		-mfloat-abi=soft -ffunction-sections -fdata-sections -fno-builtin \
+		-fno-stack-protector -fomit-frame-pointer -DNDEBUG \
+		-DMICROPY_USE_READLINE=0 -DMICROPY_PY_SOCKET=0 \
+		-DMICROPY_PY_THREAD_GIL=0 -DMICROPY_PY_WEBREPL=0 -c -MD \
+		-o $@ $<
+
 # optimising gc for speed; 5ms down to 4ms on pybv2
 $(PY_BUILD)/gc.o: CFLAGS += $(CSUPEROPT)
 
