@@ -57,7 +57,7 @@
 
 #define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_NONE)
 
-#define MICROPY_ENABLE_SOURCE_LINE          (0)
+#define MICROPY_ENABLE_SOURCE_LINE          (1)
 #define MICROPY_ENABLE_DOC_STRING           (0)
 
 #define MICROPY_ERROR_REPORTING             (MICROPY_ERROR_REPORTING_TERSE)
@@ -172,15 +172,7 @@
 #define MICROPY_PY_BTREE                        (0)
 
 //#define MICROPY_MAKE_POINTER_CALLABLE(p) ((void*)((mp_uint_t)(p) | 1))
-#define MP_PLAT_PRINT_STRN(str, len)            (void)0
-/*#define MP_PLAT_PRINT_STRN(str, len)    \
-    {                                   \
-        size_t i;                       \
-        for (i = 0; i < len; i++)       \
-        {                               \
-            printf("%c", str[i]);       \
-        }                               \
-    }*/
+#define MP_PLAT_PRINT_STRN(str, len)            sprint(str, len)
 
 typedef int32_t mp_int_t; // must be pointer size
 typedef uint32_t mp_uint_t; // must be pointer size

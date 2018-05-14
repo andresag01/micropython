@@ -37,8 +37,8 @@ SIZEFLAGS = --format=sysv --radix=10
 READELFFLAGS ?= -a -teg
 OBJDUMPFLAGS ?= -h -C -S -s -d
 
-SRC_C = main.c utils.c dlmalloc.c
-SRC_S = startup.s idiv.s idivmod.s memset.s crt.s
+SRC_C = main.c utils.c dlmalloc.c printf.c
+SRC_S = startup.s idiv.s idivmod.s memset.s crt.s lmul.s ldivmod.s
 
 OBJ = $(addprefix $(BUILD)/, $(SRC_S:.s=.o) $(SRC_C:.c=.o)) $(PY_O)
 

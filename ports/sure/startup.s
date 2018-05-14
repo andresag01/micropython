@@ -29,6 +29,16 @@ hang:   b .
 
 
     .thumb_func
+        .global sure_putchar
+sure_putchar:
+    /*
+     * The simulator has repurposed the CPS thumb instruction to print to
+     * STDOUT the character in r0
+     */
+    cpsid i
+    bx lr
+
+    .thumb_func
         .global fail
 fail:
     svc 10

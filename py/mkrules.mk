@@ -28,7 +28,7 @@ $(BUILD)/%.o: %.S
 vpath %.s . $(TOP)
 $(BUILD)/%.o: %.s
 	$(ECHO) "AS $<"
-	$(Q)$(AS) -o $@ $<
+	$(Q)$(AS) $(ASFLAGS) -o $@ $<
 
 define compile_c
 $(ECHO) "CC $<"

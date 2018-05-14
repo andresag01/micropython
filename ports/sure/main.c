@@ -48,11 +48,11 @@ STATIC void run_script(const char *src, mp_parse_input_kind_t input_kind) {
         ret = handle_uncaught_exception(nlr.ret_val);
         if (ret == 1) {
             // Real uncaught exception
-            //printf("Uncaught exception!\n");
+            printf("Uncaught exception!\n");
             fail(97);
         } else {
             // System exit returned something
-            //printf("Sytem returned 0x%04X\n", ret & ~FORCED_EXIT);
+            printf("System returned 0x%04X\n", ret & ~FORCED_EXIT);
             fail(96);
         }
     }
