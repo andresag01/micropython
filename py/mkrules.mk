@@ -35,8 +35,8 @@ $(ECHO) "CC $<"
 $(Q)$(CC) $(CFLAGS) -c -MD -o $(@:.o=.bc) $<
 $(ECHO) "LLC (OBJ) $<"
 $(Q)$(LLC) $(LLCFLAGS) -filetype=obj $(@:.o=.bc) -o $@
-$(ECHO) "LLC (ASM) $<"
-$(Q)$(LLC) $(LLCFLAGS) -filetype=asm $(@:.o=.bc) -o $(@:.o=.llvm.asm)
+@#$(ECHO) "LLC (ASM) $<"
+@#$(Q)$(LLC) $(LLCFLAGS) -filetype=asm $(@:.o=.bc) -o $(@:.o=.llvm.asm)
 @# The following fixes the dependency file.
 @# See http://make.paulandlesley.org/autodep.html for details.
 @# Regex adjusted from the above to play better with Windows paths, etc.

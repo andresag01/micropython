@@ -324,16 +324,15 @@ void mp_parse_node_print(mp_parse_node_t pn, size_t indent) {
         }
     }
 }
-#endif // MICROPY_DEBUG_PRINTERS
 
-/*
 STATIC void result_stack_show(parser_t *parser) {
-    printf("result stack, most recent first\n");
+    DEBUG_printf("--------------\n");
+    DEBUG_printf("result stack, most recent first\n");
     for (ssize_t i = parser->result_stack_top - 1; i >= 0; i--) {
         mp_parse_node_print(parser->result_stack[i], 0);
     }
 }
-*/
+#endif // MICROPY_DEBUG_PRINTERS
 
 STATIC mp_parse_node_t pop_result(parser_t *parser) {
     assert(parser->result_stack_top > 0);
@@ -1059,6 +1058,10 @@ mp_parse_tree_t mp_parse(mp_lexer_t *lex, mp_parse_input_kind_t input_kind) {
     // get the root parse node that we created
     assert(parser.result_stack_top == 1);
     parser.tree.root = parser.result_stack[0];
+
+#if MICROPY_DEBUG_PRINTERS
+    result_stack_show(&parser);
+#endif // MICROPY_DEBUG_PRINTERS
 
     // free the memory that we don't need anymore
     m_del(rule_stack_t, parser.rule_stack, parser.rule_stack_alloc);

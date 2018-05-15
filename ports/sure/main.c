@@ -7,6 +7,9 @@
 #include "py/runtime.h"
 #include "py/repl.h"
 #include "py/mperrno.h"
+#include "py/gc.h"
+#include "py/stackctrl.h"
+#include "py/builtin.h"
 
 #include "script.h"
 #include "utils.h"
@@ -53,16 +56,48 @@ STATIC void run_script(const char *src, mp_parse_input_kind_t input_kind) {
         } else {
             // System exit returned something
             printf("System returned 0x%04X\n", ret & ~FORCED_EXIT);
-            fail(96);
+            if ((ret & ~FORCED_EXIT) != 0) {
+                fail(96);
+            }
         }
     }
 }
 
 int main(void)
 {
+    /*
+     * Set the stack limits, which is 1KB less than the real stack size. This
+     * is be able to recover if the stack limit is hit
+     */
+    mp_stack_set_top(&_stack_start);
+#if MICROPY_STACK_CHECK
+    mp_stack_set_limit((char *)&_stack_start - (char *)&_stack_end - 1024);
+#endif /* MICROPY_STACK_CHECK */
+
+#if MICROPY_ENABLE_GC
+    /* Initialise the GC */
+    gc_init(&_heap_start, &_heap_end);
+#if MICROPY_GC_ALLOC_THRESHOLD
+    /* Set the collection threshold to 50% */
+    size_t heap_blocks = gc_get_num_blocks();
+    gc_set_threshold(heap_blocks / 10);
+#endif /* MICROPY_GC_ALLOC_THRESHOLD */
+#endif /* MICROPY_ENABLE_GC */
+
+    /* Initialise MicroPython */
     mp_init();
+
+    /* Run the script */
     run_script(PYTHON_SCRIPT, MP_PARSE_FILE_INPUT);
+
+#if MICROPY_PY_MICROPYTHON_MEM_INFO
+    mp_micropython_mem_info(1, NULL);
+#endif
+
+    /* Shutdown MicroPython */
     mp_deinit();
+
+    /* Return success to the system */
     return 0;
 }
 

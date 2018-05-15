@@ -39,6 +39,20 @@ void gc_lock(void);
 void gc_unlock(void);
 bool gc_is_locked(void);
 
+#if MICROPY_GC_ALLOC_THRESHOLD
+/*
+ * Configure the allocation threshold
+ *
+ * When the treshold is greater or equal to the number of allocated blocks, the
+ * following call to gc_alloc() will cause a garbage collection cycle. To
+ * configure this properly, this function needs to be passed the number of
+ * blocks (not bytes), which can be calculated by dividing the heap size by
+ * MICROPY_BYTES_PER_GC_BLOCK.
+ */
+void gc_set_threshold(size_t alloc_threshold);
+#endif /* MICROPY_GC_ALLOC_THRESHOLD */
+size_t gc_get_num_blocks();
+
 // A given port must implement gc_collect by using the other collect functions.
 void gc_collect(void);
 void gc_collect_start(void);
@@ -60,6 +74,7 @@ typedef struct _gc_info_t {
     size_t max_block;
 } gc_info_t;
 
+void gc_test(void);
 void gc_info(gc_info_t *info);
 void gc_dump_info(void);
 void gc_dump_alloc_table(void);

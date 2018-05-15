@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#define MICROPY_ALLOC_GC_STACK_SIZE         (1)
-#define MICROPY_GC_ALLOC_THRESHOLD          (0)
+#define MICROPY_ALLOC_GC_STACK_SIZE         (64)
+#define MICROPY_GC_ALLOC_THRESHOLD          (1)
 #define MICROPY_ALLOC_PATH_MAX              (512)
 #define MICROPY_MODULE_DICT_SIZE            (1)
 #define MICROPY_MALLOC_USES_ALLOCATED_SIZE  (1)
@@ -43,10 +43,10 @@
 #define MICROPY_READER_POSIX                (0)
 #define MICROPY_READER_VFS                  (0)
 
-#define MICROPY_ENABLE_GC                   (0)
+#define MICROPY_ENABLE_GC                   (1)
 #define MICROPY_ENABLE_FINALISER            (0)
 
-#define MICROPY_STACK_CHECK                 (0)
+#define MICROPY_STACK_CHECK                 (1)
 
 #define MICROPY_ENABLE_EMERGENCY_EXCEPTION_BUF  (0)
 
@@ -119,7 +119,7 @@
 #define MICROPY_PY_BUILTINS_HELP                (0)
 #define MICROPY_PY_BUILTINS_HELP_MODULES        (0)
 #define MICROPY_PY___FILE__                     (0)
-#define MICROPY_PY_MICROPYTHON_MEM_INFO         (0)
+#define MICROPY_PY_MICROPYTHON_MEM_INFO         (1)
 #define MICROPY_PY_ARRAY                        (1)
 #define MICROPY_PY_ARRAY_SLICE_ASSIGN           (1)
 #define MICROPY_PY_ATTRTUPLE                    (1)

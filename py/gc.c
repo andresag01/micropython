@@ -168,6 +168,16 @@ void gc_init(void *start, void *end) {
     DEBUG_printf("  pool at %p, length " UINT_FMT " bytes, " UINT_FMT " blocks\n", MP_STATE_MEM(gc_pool_start), gc_pool_block_len * BYTES_PER_BLOCK, gc_pool_block_len);
 }
 
+#if MICROPY_GC_ALLOC_THRESHOLD
+void gc_set_threshold(size_t alloc_threshold) {
+    MP_STATE_MEM(gc_alloc_threshold) = alloc_threshold;
+}
+#endif /* MICROPY_GC_ALLOC_THRESHOLD */
+
+size_t gc_get_num_blocks() {
+    return MP_STATE_MEM(gc_alloc_table_byte_len) * BLOCKS_PER_ATB;
+}
+
 void gc_lock(void) {
     GC_ENTER();
     MP_STATE_MEM(gc_lock_depth)++;
@@ -769,7 +779,7 @@ void gc_dump_info(void) {
 
 void gc_dump_alloc_table(void) {
     GC_ENTER();
-    static const size_t DUMP_BYTES_PER_LINE = 64;
+    static const size_t DUMP_BYTES_PER_LINE = 8;
     #if !EXTENSIVE_HEAP_PROFILING
     // When comparing heap output we don't want to print the starting
     // pointer of the heap because it changes from run to run.
@@ -877,7 +887,6 @@ void gc_dump_alloc_table(void) {
     GC_EXIT();
 }
 
-#if DEBUG_PRINT
 void gc_test(void) {
     mp_uint_t len = 500;
     mp_uint_t *heap = malloc(len);
@@ -896,21 +905,20 @@ void gc_test(void) {
     }
     for (int i = 0; i < 25; i+=2) {
         mp_uint_t *p = gc_alloc(i, false);
-        printf("p=%p\n", p);
+        DEBUG_printf("p=%p\n", p);
         if (i & 3) {
             //ptrs[i] = p;
         }
     }
 
-    printf("Before GC:\n");
+    DEBUG_printf("Before GC:\n");
     gc_dump_alloc_table();
-    printf("Starting GC...\n");
+    DEBUG_printf("Starting GC...\n");
     gc_collect_start();
     gc_collect_root(ptrs, sizeof(ptrs) / sizeof(void*));
     gc_collect_end();
-    printf("After GC:\n");
+    DEBUG_printf("After GC:\n");
     gc_dump_alloc_table();
 }
-#endif
 
 #endif // MICROPY_ENABLE_GC
