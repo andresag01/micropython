@@ -37,20 +37,12 @@
 mp_uint_t gc_helper_get_regs_and_sp(mp_uint_t *regs);
 
 void gc_collect(void) {
-    static uint32_t collection_cnt = 0;
-    printf("Collection triggered %u\n", collection_cnt++);
-
     /* start the GC */
     gc_collect_start();
-
-    printf("Collection started\n");
 
     /* get the registers and the sp */
     mp_uint_t regs[10];
     mp_uint_t sp = gc_helper_get_regs_and_sp(regs);
-
-    fail(1);
-    printf("Got registers\n");
 
     /*
      * Trace the stack, including the registers (since they live on the stack
@@ -62,8 +54,6 @@ void gc_collect(void) {
     gc_collect_root((void**)sp, ((uint32_t)&_ram_end - sp) / sizeof(uint32_t));
     #endif /* MICROPY_PY_THREAD */
 
-    printf("Collected roots\n");
-
     // trace root pointers from any threads
     #if MICROPY_PY_THREAD
     #error "MICROPY_PY_THREAD not supported!"
@@ -71,8 +61,6 @@ void gc_collect(void) {
 
     // end the GC
     gc_collect_end();
-
-    printf("Collection %u ended\n", collection_cnt - 1);
 }
 
 #endif /* MICROPY_ENABLE_GC */
