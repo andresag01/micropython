@@ -1,7 +1,6 @@
 #include <stdint.h>
 
 #define MICROPY_ALLOC_GC_STACK_SIZE         (64)
-#define MICROPY_GC_ALLOC_THRESHOLD          (1)
 #define MICROPY_ALLOC_PATH_MAX              (512)
 #define MICROPY_MODULE_DICT_SIZE            (1)
 #define MICROPY_MALLOC_USES_ALLOCATED_SIZE  (1)
@@ -44,6 +43,8 @@
 #define MICROPY_READER_VFS                  (0)
 
 #define MICROPY_ENABLE_GC                   (1)
+#define MICROPY_GC_CONSERVATIVE_CLEAR       (1)
+#define MICROPY_GC_ALLOC_THRESHOLD          (1)
 #define MICROPY_ENABLE_FINALISER            (0)
 
 #define MICROPY_STACK_CHECK                 (1)

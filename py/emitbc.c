@@ -34,6 +34,12 @@
 #include "py/emit.h"
 #include "py/bc0.h"
 
+#if MICROPY_DEBUG_VERBOSE // print debugging info
+#define DEBUG_printf printf
+#else // don't print debugging info
+#define DEBUG_printf(...) (void)0
+#endif
+
 #if MICROPY_ENABLE_COMPILER
 
 #define BYTES_FOR_INT ((BYTES_PER_WORD * 8 + 6) / 7)

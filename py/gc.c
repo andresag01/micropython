@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "py/gc.h"
@@ -117,6 +118,8 @@ void gc_init(void *start, void *end) {
 #else
     MP_STATE_MEM(gc_alloc_table_byte_len) = total_byte_len / (1 + BITS_PER_BYTE / 2 * BYTES_PER_BLOCK);
 #endif
+
+    MP_STATE_MEM(gc_cycles) = 0;
 
     MP_STATE_MEM(gc_alloc_table_start) = (byte*)start;
 
@@ -335,6 +338,7 @@ void gc_collect_end(void) {
     gc_sweep();
     MP_STATE_MEM(gc_last_free_atb_index) = 0;
     MP_STATE_MEM(gc_lock_depth)--;
+    MP_STATE_MEM(gc_cycles)++;
     GC_EXIT();
 }
 
@@ -347,6 +351,7 @@ void gc_info(gc_info_t *info) {
     info->num_1block = 0;
     info->num_2block = 0;
     info->max_block = 0;
+    info->cycles = MP_STATE_MEM(gc_cycles);
     bool finish = false;
     for (size_t block = 0, len = 0, len_free = 0; !finish;) {
         size_t kind = ATB_GET_KIND(block);
@@ -771,15 +776,15 @@ void *gc_realloc(void *ptr_in, size_t n_bytes, bool allow_move) {
 void gc_dump_info(void) {
     gc_info_t info;
     gc_info(&info);
-    mp_printf(&mp_plat_print, "GC: total: %u, used: %u, free: %u\n",
-        (uint)info.total, (uint)info.used, (uint)info.free);
+    mp_printf(&mp_plat_print, "GC: total: %u, used: %u, free: %u, cycles:%u\n",
+        (uint)info.total, (uint)info.used, (uint)info.free, (uint)info.cycles);
     mp_printf(&mp_plat_print, " No. of 1-blocks: %u, 2-blocks: %u, max blk sz: %u, max free sz: %u\n",
            (uint)info.num_1block, (uint)info.num_2block, (uint)info.max_block, (uint)info.max_free);
 }
 
 void gc_dump_alloc_table(void) {
     GC_ENTER();
-    static const size_t DUMP_BYTES_PER_LINE = 8;
+    static const size_t DUMP_BYTES_PER_LINE = 16;
     #if !EXTENSIVE_HEAP_PROFILING
     // When comparing heap output we don't want to print the starting
     // pointer of the heap because it changes from run to run.
@@ -914,9 +919,15 @@ void gc_test(void) {
     DEBUG_printf("Before GC:\n");
     gc_dump_alloc_table();
     DEBUG_printf("Starting GC...\n");
-    gc_collect_start();
-    gc_collect_root(ptrs, sizeof(ptrs) / sizeof(void*));
-    gc_collect_end();
+
+    /* This uses the port's internal root gathering functions */
+    gc_collect();
+
+    /* Manually run the garbage collection cycle */
+    //gc_collect_start();
+    //gc_collect_root(ptrs, sizeof(ptrs) / sizeof(void*));
+    //gc_collect_end();
+
     DEBUG_printf("After GC:\n");
     gc_dump_alloc_table();
 }

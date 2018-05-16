@@ -75,6 +75,7 @@ typedef struct _mp_state_mem_t {
     #endif
     byte *gc_pool_start;
     byte *gc_pool_end;
+    uint32_t gc_cycles;
 
     int gc_stack_overflow;
     size_t gc_stack[MICROPY_ALLOC_GC_STACK_SIZE];

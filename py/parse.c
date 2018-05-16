@@ -41,6 +41,12 @@
 
 #if MICROPY_ENABLE_COMPILER
 
+#if MICROPY_DEBUG_VERBOSE // print debugging info
+#define DEBUG_printf printf
+#else // don't print debugging info
+#define DEBUG_printf(...) (void)0
+#endif
+
 #define RULE_ACT_ARG_MASK       (0x0f)
 #define RULE_ACT_KIND_MASK      (0x30)
 #define RULE_ACT_ALLOW_IDENT    (0x40)

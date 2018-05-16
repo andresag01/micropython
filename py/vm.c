@@ -35,11 +35,17 @@
 #include "py/bc0.h"
 #include "py/bc.h"
 
-#if 0
+#if MICROPY_DEBUG_VERBOSE // print debugging info
+#define DEBUG_printf printf
+#else // don't print debugging info
+#define DEBUG_printf(...) (void)0
+#endif
+
+#if MICROPY_DEBUG_PRINTERS
 #define TRACE(ip) printf("sp=%d ", (int)(sp - &code_state->state[0] + 1)); mp_bytecode_print2(ip, 1, code_state->fun_bc->const_table);
 #else
 #define TRACE(ip)
-#endif
+#endif // MICROPY_DEBUG_PRINTERS
 
 // Value stack grows up (this makes it incompatible with native C stack, but
 // makes sure that arguments to functions are in natural order arg1..argN

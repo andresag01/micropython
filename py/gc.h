@@ -72,6 +72,7 @@ typedef struct _gc_info_t {
     size_t num_1block;
     size_t num_2block;
     size_t max_block;
+    size_t cycles;
 } gc_info_t;
 
 void gc_test(void);

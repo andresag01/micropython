@@ -67,14 +67,14 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(mp_micropython_mem_peak_obj, mp_micropython_mem
 mp_obj_t mp_micropython_mem_info(size_t n_args, const mp_obj_t *args) {
     (void)args;
 #if MICROPY_MEM_STATS
-    mp_printf(&mp_plat_print, "mem: total=" UINT_FMT ", current=" UINT_FMT ", peak=" UINT_FMT "\n",
+    mp_printf(&mp_plat_print, "mem: total bytes allocated=" UINT_FMT ", current bytes allocated=" UINT_FMT ", peak bytes allocated=" UINT_FMT "\n",
         (mp_uint_t)m_get_total_bytes_allocated(), (mp_uint_t)m_get_current_bytes_allocated(), (mp_uint_t)m_get_peak_bytes_allocated());
 #endif
 #if MICROPY_STACK_CHECK
-    mp_printf(&mp_plat_print, "stack: " UINT_FMT " out of " UINT_FMT "\n",
+    mp_printf(&mp_plat_print, "stack used bytes: " UINT_FMT " out of " UINT_FMT "\n",
         mp_stack_usage(), (mp_uint_t)MP_STATE_THREAD(stack_limit));
 #else
-    mp_printf(&mp_plat_print, "stack: " UINT_FMT "\n", mp_stack_usage());
+    mp_printf(&mp_plat_print, "stack used bytes: " UINT_FMT "\n", mp_stack_usage());
 #endif
 #if MICROPY_ENABLE_GC
     gc_dump_info();

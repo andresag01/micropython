@@ -38,6 +38,12 @@
 
 #if MICROPY_ENABLE_COMPILER
 
+#if MICROPY_DEBUG_VERBOSE // print debugging info
+#define DEBUG_printf printf
+#else // don't print debugging info
+#define DEBUG_printf(...) (void)0
+#endif
+
 // TODO need to mangle __attr names
 
 #define INVALID_LABEL (0xffff)

@@ -37,7 +37,7 @@
 
 #if MICROPY_DEBUG_VERBOSE // print debugging info
 #define DEBUG_PRINT (1)
-#define WRITE_CODE (1)
+//#define WRITE_CODE (1)
 #define DEBUG_printf printf
 #define DEBUG_OP_printf(...) DEBUG_printf(__VA_ARGS__)
 #else // don't print debugging info
@@ -46,7 +46,7 @@
 #endif
 
 #if MICROPY_DEBUG_PRINTERS
-mp_uint_t mp_verbose_flag = 0;
+mp_uint_t mp_verbose_flag = 100;
 #endif
 
 mp_raw_code_t *mp_emit_glue_new_raw_code(void) {
