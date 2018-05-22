@@ -1,15 +1,15 @@
 /* memmap */
 MEMORY
 {
-    ram(WAIL) : ORIGIN = 0x00000000, LENGTH = 10M
+    ram(WAIL) : ORIGIN = 0x00000000, LENGTH = 219K
 }
 
 ENTRY(_start)
 
 /* Set the minimum heap size */
-_min_heap_size = 900K;
+_min_heap_size = 50K;
 /* Set the minimum stack size */
-_min_stack_size = 100K;
+_min_stack_size = 10K;
 
 _ram_start = ORIGIN(ram);
 _ram_end = ORIGIN(ram) + LENGTH(ram);

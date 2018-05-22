@@ -44,6 +44,11 @@ fail:
     svc 10
 
     .thumb_func
+        .global success
+success:
+    bkpt 0
+
+    .thumb_func
         .global out_of_memory
 out_of_memory:
     svc 2
@@ -53,7 +58,6 @@ out_of_memory:
 _start:
     /* Execute the benchmark */
     bl main
-    /* Terminate the simulation */
-    bkpt 0
+    bl success
 
 .end
