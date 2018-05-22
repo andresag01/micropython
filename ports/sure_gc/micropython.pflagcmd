@@ -1,0 +1,469 @@
+# Set pointer flag to the byte * array qstrs in the mp_qstr_const_pool
+# struct initialised in py/qstr.c. The declaration of the struct is:
+# typedef struct _qstr_pool_t {
+#     struct _qstr_pool_t *prev;
+#     size_t total_prev_len;
+#     size_t alloc;
+#     size_t len;
+#     const byte *qstrs[];
+# } qstr_pool_t;
+# So we need to skip over 4 elements of 4 bytes long each
+makeptroffset 16 end mp_qstr_const_pool
+makeptr tok_kw
+
+# Set the pointer flag for the function * in the rules array. This needs to be
+# done in two stages because there is a NULL in between, which we do not want
+# to set the pointer flag for, as it would fail when comparing against regular
+# NULL.
+# TODO: Update these when enabling more features in the mpconfig.h file
+makeptroffset 0 212 rules
+makeptroffset 216 end rules
+
+# Set the pointer flag for the function * in the emit bytecode method table.
+# The first pointer is always NULL, so we skip over that.
+makeptroffset 4 end emit_bc_method_table
+
+# Set the pointer flag for the function * to compilation functions.
+makeptr compile_function
+
+# Make the structs of type mp_obj_time_t pointers. The objects have the
+# following members:
+# struct _mp_obj_type_t {
+#      0 mp_obj_base_t          base;           (ptr)
+#      4 qstr                   name;           (val)
+#      8 mp_print_fun_t         print;          (ptr)
+#     12 mp_make_new_fun_t      make_new;       (ptr)
+#     16 mp_call_fun_t          call;           (ptr)
+#     20 mp_unary_op_fun_t      unary_op;       (ptr)
+#     24 mp_binary_op_fun_t     binary_op;      (ptr)
+#     28 mp_attr_fun_t          attr;           (ptr)
+#     32 mp_subscr_fun_t        subscr;         (ptr)
+#     36 mp_getiter_fun_t       getiter;        (ptr)
+#     40 mp_fun_1_t             iternext;       (ptr)
+#     44 mp_buffer_p_t          buffer_p;       (ptr)
+#     48 const void            *protocol;       (ptr)
+#     52 const void            *parent;         (ptr)
+#     56 struct _mp_obj_dict_t *locals_dict;    (ptr)
+# }
+makeptroffset 0 4 mp_type_type
+makeptroffset 8 16 mp_type_type
+makeptroffset 28 4 mp_type_type
+
+# TODO: make locals_dict pointer when MICROPY_CPYTHON_COMPAT is enabled
+makeptroffset 0 4 mp_type_object
+makeptroffset 12 4 mp_type_object
+
+makeptroffset 0 4 mp_type_NoneType
+makeptroffset 8 4 mp_type_NoneType
+makeptroffset 20 4 mp_type_NoneType
+
+makeptroffset 0 4 mp_type_bool
+makeptroffset 8 8 mp_type_bool
+makeptroffset 20 8 mp_type_bool
+
+makeptroffset 0 4 mp_type_int
+makeptroffset 8 8 mp_type_int
+makeptroffset 20 8 mp_type_int
+makeptroffset 56 4 mp_type_int
+
+# TODO: this need be removed if MICROPY_PY_BUILTINS_STR_UNICODE
+makeptroffset 0 4 mp_type_str
+makeptroffset 8 8 mp_type_str
+makeptroffset 24 4 mp_type_str
+makeptroffset 32 8 mp_type_str
+makeptroffset 44 4 mp_type_str
+makeptroffset 56 4 mp_type_str
+
+makeptroffset 0 4 mp_type_bytes
+makeptroffset 8 8 mp_type_bytes
+makeptroffset 24 4 mp_type_bytes
+makeptroffset 32 8 mp_type_bytes
+makeptroffset 44 4 mp_type_bytes
+makeptroffset 56 4 mp_type_bytes
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_BYTEARRAY is enabled
+# makeptroffset 0 4 mp_type_bytearray
+# makeptroffset 8 8 mp_type_bytearray
+# makeptroffset 20 8 mp_type_bytearray
+# makeptroffset 32 8 mp_type_bytearray
+# makeptroffset 44 4 mp_type_bytearray
+# makeptroffset 56 4 mp_type_bytearray
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_MEMORYVIEW is enabled
+#makeptroffset 0 4 mp_type_memoryview
+#makeptroffset 12 4 mp_type_memoryview
+#makeptroffset 20 8 mp_type_memoryview
+#makeptroffset 32 8 mp_type_memoryview
+#makeptroffset 44 4 mp_type_memoryview
+
+# TODO: mp_type_float and mp_type_complex are not allowed because the simulator
+# does not support fp arithmetic instructions
+
+makeptroffset 0 4 mp_type_tuple
+makeptroffset 8 8 mp_type_tuple
+makeptroffset 20 8 mp_type_tuple
+makeptroffset 32 8 mp_type_tuple
+makeptroffset 56 4 mp_type_tuple
+
+makeptroffset 0 4 mp_type_list
+makeptroffset 8 8 mp_type_list
+makeptroffset 20 8 mp_type_list
+makeptroffset 32 8 mp_type_list
+makeptroffset 56 4 mp_type_list
+
+makeptroffset 0 4 mp_type_map
+makeptroffset 12 4 mp_type_map
+makeptroffset 36 8 mp_type_map
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_ENUMERATE is enabled
+# makeptroffset 0 4 mp_type_enumerate
+# makeptroffset 12 4 mp_type_enumerate
+# makeptroffset 36 8 mp_type_enumerate
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_FILTER is enabled
+# makeptroffset 0 4 mp_type_filter
+# makeptroffset 12 4 mp_type_filter
+# makeptroffset 36 8 mp_type_filter
+
+makeptroffset 0 4 mp_type_dict
+makeptroffset 8 8 mp_type_dict
+makeptroffset 20 8 mp_type_dict
+makeptroffset 32 8 mp_type_dict
+makeptroffset 56 4 mp_type_dict
+
+# TODO: uncomment these commands when MICROPY_PY_COLLECTIONS_ORDEREDDICT is
+# enabled
+# makeptroffset 0 4 mp_type_ordereddict
+# makeptroffset 8 8 mp_type_ordereddict
+# makeptroffset 20 8 mp_type_ordereddict
+# makeptroffset 32 8 mp_type_ordereddict
+# makeptroffset 52 8 mp_type_ordereddict
+
+makeptroffset 0 4 mp_type_range
+makeptroffset 8 8 mp_type_range
+makeptroffset 20 4 mp_type_range
+makeptroffset 32 8 mp_type_range
+# TODO: uncomment this command when MICROPY_PY_BUILTINS_RANGE_ATTRS is enabled
+# makeptroffset 28 4 mp_type_range
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_SET is enabled
+# makeptroffset 0 4 mp_type_set
+# makeptroffset 8 8 mp_type_set
+# makeptroffset 20 8 mp_type_set
+# makeptroffset 36 4 mp_type_set
+# makeptroffset 56 4 mp_type_set
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_FROZENSET is enabled
+# makeptroffset 0 4 mp_type_frozenset
+# makeptroffset 8 8 mp_type_frozenset
+# makeptroffset 20 8 mp_type_frozenset
+# makeptroffset 36 4 mp_type_frozenset
+# makeptroffset 56 4 mp_type_frozenset
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_SLICE is enabled
+# makeptroffset 0 4 mp_type_slice
+# makeptroffset 8 4 mp_type_slice
+# TODO: uncomment this command when MICROPY_PY_BUILTINS_SLICE_ATTRS is enabled
+# makeptroffset 28 4 mp_type_slice
+
+makeptroffset 0 4 mp_type_zip
+makeptroffset 12 4 mp_type_zip
+makeptroffset 36 8 mp_type_zip
+
+# TODO: uncomment these commands when MICROPY_PY_ARRAY is enabled
+# makeptroffset 0 4 mp_type_array
+# makeptroffset 8 8 mp_type_array
+# makeptroffset 20 8 mp_type_array
+# makeptroffset 32 8 mp_type_array
+# makeptrofset 44 4 mp_type_array
+# makeptroffset 56 4 mp_type_array
+
+makeptroffset 0 4 mp_type_super
+makeptroffset 8 8 mp_type_super
+makeptroffset 28 4 mp_type_super
+
+makeptroffset 0 4 mp_type_gen_instance
+makeptroffset 8 4 mp_type_gen_instance
+makeptroffset 20 4 mp_type_gen_instance
+makeptroffset 36 8 mp_type_gen_instance
+makeptroffset 56 4 mp_type_gen_instance
+
+makeptroffset 0 4 mp_type_fun_builtin_0
+makeptroffset 16 8 mp_type_fun_builtin_0
+
+makeptroffset 0 4 mp_type_fun_builtin_1
+makeptroffset 16 8 mp_type_fun_builtin_1
+
+makeptroffset 0 4 mp_type_fun_builtin_2
+makeptroffset 16 8 mp_type_fun_builtin_2
+
+makeptroffset 0 4 mp_type_fun_builtin_3
+makeptroffset 16 8 mp_type_fun_builtin_3
+
+makeptroffset 0 4 mp_type_fun_builtin_var
+makeptroffset 16 8 mp_type_fun_builtin_var
+
+makeptroffset 0 4 mp_type_fun_bc
+# TODO: uncomment this command when MICROPY_CPYTHON_COMPAT is enabled
+#makeptroffset 8 4 mp_type_fun_bc
+makeptroffset 16 8 mp_type_fun_bc
+# TODO: uncomment this command when MICROPY_PY_FUNCTION_ATTRS is enabled
+#makeptroffset 28 4 mp_type_fun_bc
+
+makeptroffset 0 4 mp_type_module
+makeptroffset 8 4 mp_type_module
+makeptroffset 28 4 mp_type_module
+
+makeptroffset 0 4 mp_type_staticmethod
+makeptroffset 12 4 mp_type_staticmethod
+
+makeptroffset 0 4 mp_type_classmethod
+makeptroffset 12 4 mp_type_classmethod
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_PROPERTY is enabled
+# makeptroffset 0 4 mp_type_property
+# makeptroffset 12 4 mp_type_property
+# makeptroffset 56 4 mp_type_property
+
+# TODO: mp_type_stringio and mp_type_bytesio are not allowed because the
+# simulator does not support peripherals
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_REVERSED is enabled
+# makeptroffset 0 4 mp_type_reversed
+# makeptroffset 12 4 mp_type_reversed
+# makeptroffset 36 8 mp_type_reversed
+
+makeptroffset 0 4 mp_type_polymorph_iter
+makeptroffset 36 8 mp_type_polymorph_iter
+
+makeptroffset 0 4 mp_type_BaseException
+makeptroffset 8 8 mp_type_BaseException
+makeptroffset 28 4 mp_type_BaseException
+makeptroffset 56 4 mp_type_BaseException
+
+makeptroffset 0 4 mp_type_ArithmeticError
+makeptroffset 8 8 mp_type_ArithmeticError
+makeptroffset 28 4 mp_type_ArithmeticError
+makeptroffset 52 4 mp_type_ArithmeticError
+
+makeptroffset 0 4 mp_type_AssertionError
+makeptroffset 8 8 mp_type_AssertionError
+makeptroffset 28 4 mp_type_AssertionError
+makeptroffset 52 4 mp_type_AssertionError
+
+makeptroffset 0 4 mp_type_AttributeError
+makeptroffset 8 8 mp_type_AttributeError
+makeptroffset 28 4 mp_type_AttributeError
+makeptroffset 52 4 mp_type_AttributeError
+
+makeptroffset 0 4 mp_type_EOFError
+makeptroffset 8 8 mp_type_EOFError
+makeptroffset 28 4 mp_type_EOFError
+makeptroffset 52 4 mp_type_EOFError
+
+makeptroffset 0 4 mp_type_Exception
+makeptroffset 8 8 mp_type_Exception
+makeptroffset 28 4 mp_type_Exception
+makeptroffset 52 4 mp_type_Exception
+
+makeptroffset 0 4 mp_type_GeneratorExit
+makeptroffset 8 8 mp_type_GeneratorExit
+makeptroffset 28 4 mp_type_GeneratorExit
+makeptroffset 52 4 mp_type_GeneratorExit
+
+makeptroffset 0 4 mp_type_ImportError
+makeptroffset 8 8 mp_type_ImportError
+makeptroffset 28 4 mp_type_ImportError
+makeptroffset 52 4 mp_type_ImportError
+
+makeptroffset 0 4 mp_type_IndentationError
+makeptroffset 8 8 mp_type_IndentationError
+makeptroffset 28 4 mp_type_IndentationError
+makeptroffset 52 4 mp_type_IndentationError
+
+makeptroffset 0 4 mp_type_IndexError
+makeptroffset 8 8 mp_type_IndexError
+makeptroffset 28 4 mp_type_IndexError
+makeptroffset 52 4 mp_type_IndexError
+
+makeptroffset 0 4 mp_type_KeyboardInterrupt
+makeptroffset 8 8 mp_type_KeyboardInterrupt
+makeptroffset 28 4 mp_type_KeyboardInterrupt
+makeptroffset 52 4 mp_type_KeyboardInterrupt
+
+makeptroffset 0 4 mp_type_KeyError
+makeptroffset 8 8 mp_type_KeyError
+makeptroffset 28 4 mp_type_KeyError
+makeptroffset 52 4 mp_type_KeyError
+
+makeptroffset 0 4 mp_type_LookupError
+makeptroffset 8 8 mp_type_LookupError
+makeptroffset 28 4 mp_type_LookupError
+makeptroffset 52 4 mp_type_LookupError
+
+makeptroffset 0 4 mp_type_MemoryError
+makeptroffset 8 8 mp_type_MemoryError
+makeptroffset 28 4 mp_type_MemoryError
+makeptroffset 52 4 mp_type_MemoryError
+
+makeptroffset 0 4 mp_type_NameError
+makeptroffset 8 8 mp_type_NameError
+makeptroffset 28 4 mp_type_NameError
+makeptroffset 52 4 mp_type_NameError
+
+# TODO: This does not seem to be in the image even though its defined. Probably
+# because the functions that use this struct are not used so they were stripped
+# out by the linker. Watch out in case they pop up again
+# makeptroffset 0 4 mp_type_NotImplementedError
+# makeptroffset 8 8 mp_type_NotImplementedError
+# makeptroffset 28 4 mp_type_NotImplementedError
+# makeptroffset 52 4 mp_type_NotImplementedError
+
+makeptroffset 0 4 mp_type_OSError
+makeptroffset 8 8 mp_type_OSError
+makeptroffset 28 4 mp_type_OSError
+makeptroffset 52 4 mp_type_OSError
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_TIMEOUTERROR is
+# enabled
+# makeptroffset 0 4 mp_type_TimeoutError
+# makeptroffset 8 8 mp_type_TimeoutError
+# makeptroffset 28 4 mp_type_TimeoutError
+# makeptroffset 52 4 mp_type_TimeoutError
+
+makeptroffset 0 4 mp_type_OverflowError
+makeptroffset 8 8 mp_type_OverflowError
+makeptroffset 28 4 mp_type_OverflowError
+makeptroffset 52 4 mp_type_OverflowError
+
+makeptroffset 0 4 mp_type_RuntimeError
+makeptroffset 8 8 mp_type_RuntimeError
+makeptroffset 28 4 mp_type_RuntimeError
+makeptroffset 52 4 mp_type_RuntimeError
+
+# TODO: mp_type_StopAsyncIteration is not allowed
+
+makeptroffset 0 4 mp_type_StopIteration
+makeptroffset 8 8 mp_type_StopIteration
+makeptroffset 28 4 mp_type_StopIteration
+makeptroffset 52 4 mp_type_StopIteration
+
+makeptroffset 0 4 mp_type_SyntaxError
+makeptroffset 8 8 mp_type_SyntaxError
+makeptroffset 28 4 mp_type_SyntaxError
+makeptroffset 52 4 mp_type_SyntaxError
+
+makeptroffset 0 4 mp_type_SystemExit
+makeptroffset 8 8 mp_type_SystemExit
+makeptroffset 28 4 mp_type_SystemExit
+makeptroffset 52 4 mp_type_SystemExit
+
+makeptroffset 0 4 mp_type_TypeError
+makeptroffset 8 8 mp_type_TypeError
+makeptroffset 28 4 mp_type_TypeError
+makeptroffset 52 4 mp_type_TypeError
+
+# TODO: uncomment these commands when MICROPY_PY_BUILTINS_STR_UNICODE is
+# enabled
+# makeptroffset 0 4 mp_type_UnicodeError
+# makeptroffset 8 8 mp_type_UnicodeError
+# makeptroffset 28 4 mp_type_UnicodeError
+# makeptroffset 52 4 mp_type_UnicodeError
+
+makeptroffset 0 4 mp_type_ValueError
+makeptroffset 8 8 mp_type_ValueError
+makeptroffset 28 4 mp_type_ValueError
+makeptroffset 52 4 mp_type_ValueError
+
+# TODO: uncomment these commands when MICROPY_EMIT_NATIVE is enabled (which
+# should always be)
+makeptroffset 0 4 mp_type_ViperTypeError
+makeptroffset 8 8 mp_type_ViperTypeError
+makeptroffset 28 4 mp_type_ViperTypeError
+makeptroffset 52 4 mp_type_ViperTypeError
+
+makeptroffset 0 4 mp_type_ZeroDivisionError
+makeptroffset 8 8 mp_type_ZeroDivisionError
+makeptroffset 28 4 mp_type_ZeroDivisionError
+makeptroffset 52 4 mp_type_ZeroDivisionError
+
+# Make the contents of mp_const_none_obj pointer. Its type is:
+# typedef struct _mp_obj_none_t {
+#     mp_obj_base_t base;
+# } mp_obj_none_t;
+#
+# struct _mp_obj_base_t {
+#     const mp_obj_type_t *type MICROPY_OBJ_BASE_ALIGNMENT;
+# };
+makeptr mp_const_none_obj
+
+# Make the first element of mp_const_true_obj and mp_const_false_obj a pointer.
+# Their type is:
+# typedef struct _mp_obj_bool_t {
+#     mp_obj_base_t base;
+#     bool value;
+# } mp_obj_bool_t;
+makeptroffset 0 4 mp_const_false_obj
+makeptroffset 0 4 mp_const_true_obj
+
+# Make the first and last element of mp_const_empty_bytes_obj pointers. Their
+# type is:
+# typedef struct _mp_obj_str_t {
+#     mp_obj_base_t base;
+#     mp_uint_t hash;
+#     size_t len;
+#     const byte *data;
+# } mp_obj_str_t;
+makeptroffset 0 4 mp_const_empty_bytes_obj
+makeptroffset 12 4 mp_const_empty_bytes_obj
+
+# Make the first element of mp_const_empty_tuple_obj pointers. Their type is:
+# typedef struct _mp_obj_tuple_t {
+#     mp_obj_base_t base;
+#     size_t len;
+#     mp_obj_t items[];
+# } mp_obj_tuple_t;
+makeptroffset 0 4 mp_const_empty_tuple_obj
+
+# Make the first element of mp_const_ellipsis_obj pointers. Their type is:
+# typedef struct _mp_obj_singleton_t {
+#     mp_obj_base_t base;
+#     qstr name;
+# } mp_obj_singleton_t;
+makeptroffset 0 4 mp_const_ellipsis_obj
+
+# Make the first element of mp_const_notimplemented_obj pointers. Their type
+# is:
+# typedef struct _mp_obj_singleton_t {
+#     mp_obj_base_t base;
+#     qstr name;
+# } mp_obj_singleton_t;
+# TODO: uncomment this commands when MICROPY_PY_BUILTINS_STR_UNICODE is enabled
+# makeptroffset 0 4 mp_const_notimplemented_obj
+
+# Make the first and last elements of mp_const_MemoryError_obj pointers. Its
+# type is:
+# typedef struct _mp_obj_exception_t {
+#     mp_obj_base_t base;
+#     size_t traceback_alloc : (8 * sizeof(size_t) / 2);
+#     size_t traceback_len : (8 * sizeof(size_t) / 2);
+#     size_t *traceback_data;
+#     mp_obj_tuple_t *args;
+# } mp_obj_exception_t;
+makeptroffset 0 4 mp_const_MemoryError_obj
+makeptroffset 12 4 mp_const_MemoryError_obj
+
+# Make the first and last elements of mp_const_GeneratorExit_obj pointers. Its
+# type is:
+# typedef struct _mp_obj_exception_t {
+#     mp_obj_base_t base;
+#     size_t traceback_alloc : (8 * sizeof(size_t) / 2);
+#     size_t traceback_len : (8 * sizeof(size_t) / 2);
+#     size_t *traceback_data;
+#     mp_obj_tuple_t *args;
+# } mp_obj_exception_t;
+# TODO: This does not seem to be in the image even though its defined. Probably
+# because the functions that use this struct are not used so they were stripped
+# out by the linker. Watch out in case they pop up again
+# makeptroffset 0 4 mp_const_GeneratorExit_obj
+# makeptroffset 12 4 mp_const_GeneratorExit_obj
