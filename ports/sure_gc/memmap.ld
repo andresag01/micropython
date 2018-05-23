@@ -1,7 +1,7 @@
 /* memmap */
 MEMORY
 {
-    ram(WAIL) : ORIGIN = 0x00000000, LENGTH = 2M
+    ram(WAIL) : ORIGIN = 0x00000000, LENGTH = 219K
 }
 
 ENTRY(_start)

@@ -70,11 +70,3 @@
 "\n"                                                                    \
 "print(\"Starting python\")\n"                                          \
 "bench_n_queens(5)"
-
-/*
-"import sys\n"                                                          \
-"\n"                                                                    \
-"a = [1, 2, 3, 4, 5]\n"                                                 \
-"print(\"Hello world!\", a)\n"                                          \
-"sys.exit(0)"
-*/

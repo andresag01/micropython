@@ -25,23 +25,29 @@
 "    for i in reversed(list(range(n - r + 1, n + 1))):\n"               \
 "        cycles.append(i)\n"                                            \
 "    res.append(tuple(pool[i] for i in indices[:r]))\n"                 \
+"    print(\"permutation start\")\n"                                    \
 "    while n:\n"                                                        \
 "        for i in reversed(range(r)):\n"                                \
 "            cycles[i] -= 1\n"                                          \
 "            if cycles[i] == 0:\n"                                      \
+"                print(\"permutations if\")\n"                          \
 "                indices[i:] = indices[i + 1:] + indices[i:i + 1]\n"    \
 "                cycles[i] = n - i\n"                                   \
 "            else:\n"                                                   \
+"                print(\"permutations else\")\n"                        \
 "                j = cycles[i]\n"                                       \
 "                indices[i], indices[-j] = indices[-j], indices[i]\n"   \
 "                res.append(tuple(pool[i] for i in indices[:r]))\n"     \
 "                break\n"                                               \
 "        else:\n"                                                       \
+"            print(\"Permutation end\")\n"                              \
 "            return res\n"                                              \
+"    print(\"Permutation end\")\n"                                      \
 "    return res\n"                                                      \
 "\n"                                                                    \
 "\n"                                                                    \
 "def n_queens(queen_count):\n"                                          \
+"    print(\"Starting nqueens\")\n"                                     \
 "    cols = range(queen_count)\n"                                       \
 "    res = []\n"                                                        \
 "    for vec in permutations(cols):\n"                                  \

@@ -46,16 +46,16 @@ fail:
     .thumb_func
         .global _start
 _start:
-    /* Allocate 8KB of stack */
-    mov r0, #1
-    lsl r0, r0, #12
+    /* Allocate 10KB of stack */
+    mov r0, #10
+    lsl r0, r0, #8
     wfi
     /*
      * Set the sp to the end of the object we just allocated (assume
      * descending stack)
      */
-    mov r1, #4
-    lsl r1, r1, #12
+    mov r1, #10
+    lsl r1, r1, #10
     add r0, r0, r1
     mov sp, r0
     /* Make sure we do not leave a copy of the stack lying around */
