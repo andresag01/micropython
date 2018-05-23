@@ -21,7 +21,10 @@ LDSCRIPT = memmap.ld
 #SYSROOT = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/lib/clang/7.0.0/include
 SYSROOT = /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-none-eabi/include
 
-CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O2 -mcpu=cortex-m0 \
+OPT_LEVEL = 0
+
+CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
+	-mcpu=cortex-m0 \
 	--target=thumb -Wall -emit-llvm -nostdlib -ffreestanding -mfloat-abi=soft \
 	-ffunction-sections -fdata-sections -fno-builtin -fno-stack-protector \
 	-momit-leaf-frame-pointer -DNDEBUG \
@@ -30,7 +33,7 @@ CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O2 -mcpu=cortex-m0 \
 	-DMICROPY_PY_THREAD_GIL=$(MICROPY_PY_THREAD_GIL) \
 	-DMICROPY_PY_WEBREPL=$(MICROPY_PY_WEBREPL)
 LLCFLAGS = -mtriple=arm-none-eabi -march=thumb -float-abi=soft \
-	-function-sections -O2 -data-sections -disable-simplify-libcalls
+	-function-sections -O$(OPT_LEVEL) -data-sections -disable-simplify-libcalls
 LDFLAGS = -static -nostdlib --gc-sections -T $(LDSCRIPT) -Map $(@:.elf=.map)
 ASFLAGS = -mthumb
 SIZEFLAGS = --format=sysv --radix=10
