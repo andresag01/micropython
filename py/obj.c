@@ -37,6 +37,12 @@
 #include "py/stackctrl.h"
 #include "py/stream.h" // for mp_obj_print
 
+#if MICROPY_DEBUG_VERBOSE // print debugging info
+#define DEBUG_printf printf
+#else // don't print debugging info
+#define DEBUG_printf(...) (void)0
+#endif
+
 mp_obj_type_t *mp_obj_get_type(mp_const_obj_t o_in) {
     if (MP_OBJ_IS_SMALL_INT(o_in)) {
         return (mp_obj_type_t*)&mp_type_int;
