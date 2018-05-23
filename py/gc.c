@@ -910,6 +910,10 @@ void gc_test(void) {
     }
     for (int i = 0; i < 25; i+=2) {
         mp_uint_t *p = gc_alloc(i, false);
+#if !MICROPY_DEBUG_VERBOSE
+        // Avoid compilation warning for unused variable p
+        (void)p;
+#endif
         DEBUG_printf("p=%p\n", p);
         if (i & 3) {
             //ptrs[i] = p;
