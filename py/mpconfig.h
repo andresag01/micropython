@@ -233,6 +233,12 @@
 #define alloca(x) m_malloc(x)
 #endif
 
+// Whether to disable the use of realloc from stdlib.h. An internal realloc
+// implementation will be used instead
+#ifndef MICROPY_NO_REALLOC
+#define MICROPY_NO_REALLOC (0)
+#endif
+
 /*****************************************************************************/
 /* MicroPython emitters                                                     */
 

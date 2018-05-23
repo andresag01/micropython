@@ -42,6 +42,13 @@
 #define UPDATE_PEAK() { if (MP_STATE_MEM(current_bytes_allocated) > MP_STATE_MEM(peak_bytes_allocated)) MP_STATE_MEM(peak_bytes_allocated) = MP_STATE_MEM(current_bytes_allocated); }
 #endif
 
+/* Compilation check */
+#if MICROPY_NO_REALLOC && !MICROPY_MALLOC_USES_ALLOCATED_SIZE
+#error "MICROPY_NO_REALLOC requires MICROPY_MALLOC_USES_ALLOCATED_SIZE!"
+#elif MICROPY_NO_REALLOC && MICROPY_ENABLE_GC
+#error "MICROPY_NO_REALLOC cannot be enabled simultaneously with MICROPY_ENABLE_GC!"
+#endif
+
 #if MICROPY_ENABLE_GC
 #include "py/gc.h"
 
@@ -59,9 +66,31 @@
 #define realloc(ptr, n) gc_realloc(ptr, n, true)
 #define realloc_ext(ptr, n, mv) gc_realloc(ptr, n, mv)
 #else
+
+#if MICROPY_NO_REALLOC
+STATIC void *internal_realloc(void *ptr, size_t old_size, size_t new_size) {
+    void *new_ptr = NULL;
+
+    new_ptr = malloc(new_size);
+    if (new_size > 0 && old_size > 0) {
+        memcpy(new_ptr, ptr, old_size);
+    }
+
+    return new_ptr;
+}
+#endif /* MICROPY_NO_REALLOC */
+
+#if MICROPY_NO_REALLOC
+STATIC void *realloc_ext(void *ptr, size_t old_num_bytes, size_t n_bytes, bool allow_move) {
+#else
 STATIC void *realloc_ext(void *ptr, size_t n_bytes, bool allow_move) {
+#endif /* MICROPY_NO_REALLOC */
     if (allow_move) {
+#if MICROPY_NO_REALLOC
+        return internal_realloc(ptr, old_num_bytes, n_bytes);
+#else
         return realloc(ptr, n_bytes);
+#endif /* MICROPY_NO_REALLOC */
     } else {
         // We are asked to resize, but without moving the memory region pointed to
         // by ptr.  Unless the underlying memory manager has special provision for
@@ -129,7 +158,11 @@ void *m_realloc(void *ptr, size_t old_num_bytes, size_t new_num_bytes) {
 #else
 void *m_realloc(void *ptr, size_t new_num_bytes) {
 #endif
+#if MICROPY_NO_REALLOC
+    void *new_ptr = internal_realloc(ptr, old_num_bytes, new_num_bytes);
+#else
     void *new_ptr = realloc(ptr, new_num_bytes);
+#endif /* MICROPY_NO_REALLOC */
     if (new_ptr == NULL && new_num_bytes != 0) {
         m_malloc_fail(new_num_bytes);
     }
@@ -153,7 +186,11 @@ void *m_realloc_maybe(void *ptr, size_t old_num_bytes, size_t new_num_bytes, boo
 #else
 void *m_realloc_maybe(void *ptr, size_t new_num_bytes, bool allow_move) {
 #endif
+#if MICROPY_NO_REALLOC
+    void *new_ptr = realloc_ext(ptr, old_num_bytes, new_num_bytes, allow_move);
+#else
     void *new_ptr = realloc_ext(ptr, new_num_bytes, allow_move);
+#endif /* MICROPY_NO_REALLOC */
 #if MICROPY_MEM_STATS
     // At first thought, "Total bytes allocated" should only grow,
     // after all, it's *total*. But consider for example 2K block
