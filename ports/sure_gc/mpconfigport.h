@@ -34,8 +34,8 @@
 
 #define MICROPY_MEM_STATS                   (0)
 
-#define MICROPY_DEBUG_PRINTERS              (1)
-#define MICROPY_DEBUG_VERBOSE               (1)
+#define MICROPY_DEBUG_PRINTERS              (0)
+#define MICROPY_DEBUG_VERBOSE               (0)
 
 #define MICROPY_OPT_COMPUTED_GOTO                   (0)
 #define MICROPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE    (0)
