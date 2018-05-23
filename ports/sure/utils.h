@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 void fail(int error);
-void success();
+void success(void);
 void out_of_memory(void);
 void *_sbrk_r(size_t sizeBytes);
 void sure_putchar(char character);

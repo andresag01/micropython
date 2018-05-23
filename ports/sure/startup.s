@@ -25,8 +25,8 @@
 
 
     .thumb_func
-hang:   b .
-
+hang:
+    b .
 
     .thumb_func
         .global sure_putchar

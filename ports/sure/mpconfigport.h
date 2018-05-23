@@ -9,6 +9,7 @@
 #define MICROPY_STACKLESS                   (0)
 #define MICROPY_STACKLESS_STRICT            (0)
 #define MICROPY_NO_ALLOCA                   (1)
+#define MICROPY_NO_REALLOC                  (0)
 
 #define MICROPY_EMIT_X64                    (0)
 #define MICROPY_EMIT_X86                    (0)

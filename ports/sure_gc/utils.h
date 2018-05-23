@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 void fail(int error);
+void success(void);
 void out_of_memory(void);
 void sure_putchar(char character);
 void sprint(char *str, size_t len);
