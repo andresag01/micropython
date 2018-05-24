@@ -69,9 +69,9 @@ int main(void)
      * Set the stack limits, which is 1KB less than the real stack size. This
      * is be able to recover if the stack limit is hit
      */
-    mp_stack_set_top(&_stack_start);
+    mp_stack_set_top(&_stack_end);
 #if MICROPY_STACK_CHECK
-    mp_stack_set_limit((char *)&_stack_start - (char *)&_stack_end - 1024);
+    mp_stack_set_limit((char *)&_stack_end - (char *)&_stack_start);
 #endif /* MICROPY_STACK_CHECK */
 
 #if MICROPY_ENABLE_GC
@@ -80,7 +80,7 @@ int main(void)
 #if MICROPY_GC_ALLOC_THRESHOLD
     /* Set the collection threshold to 50% */
     size_t heap_blocks = gc_get_num_blocks();
-    gc_set_threshold(heap_blocks / 10);
+    gc_set_threshold(heap_blocks);
 #endif /* MICROPY_GC_ALLOC_THRESHOLD */
 #endif /* MICROPY_ENABLE_GC */
 

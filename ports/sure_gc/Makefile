@@ -24,7 +24,7 @@ SYSROOT = /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-non
 PFLAGS_SCRIPT ?= ./scripts/get_code_pflags.py
 SORT_READELF_SCRIPT ?= ./scripts/sort_readelf.py
 
-OPT_LEVEL = 0
+OPT_LEVEL = 2
 
 CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
 	-mcpu=cortex-m0 \

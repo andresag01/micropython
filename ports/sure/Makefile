@@ -21,7 +21,7 @@ LDSCRIPT = memmap.ld
 #SYSROOT = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/lib/clang/7.0.0/include
 SYSROOT = /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-none-eabi/include
 
-OPT_LEVEL = 0
+OPT_LEVEL = 2
 
 CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
 	-mcpu=cortex-m0 \

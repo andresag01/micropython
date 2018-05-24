@@ -2,7 +2,7 @@
     .thumb
     .cpu cortex-m0
 
-.word   _stack_start /* stack top address */
+.word   _stack_end   /* stack top address */
 .word   _start       /* 1 Reset */
 .word   hang         /* 2 NMI */
 .word   hang         /* 3 HardFault */
