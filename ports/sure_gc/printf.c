@@ -634,7 +634,7 @@ int vsnprintf(char* buffer, size_t count, const char* format, va_list va)
   return _vsnprintf(buffer, count, format, va);
 }
 
-void sprint(char *str, size_t len)
+void sprint(const char *str, size_t len)
 {
     size_t i;
 

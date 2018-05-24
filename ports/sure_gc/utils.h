@@ -4,11 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void fail(int error);
-void success(void);
-void out_of_memory(void);
+__attribute__((noreturn)) void fail(int error);
+__attribute__((noreturn)) void success(void);
+__attribute__((noreturn)) void out_of_memory(void);
 void sure_putchar(char character);
-void sprint(char *str, size_t len);
+void sprint(const char *str, size_t len);
 
 /* Variables defining memory layout */
 extern uint32_t _ram_start;

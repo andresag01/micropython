@@ -27,7 +27,7 @@ SORT_READELF_SCRIPT ?= ./scripts/sort_readelf.py
 OPT_LEVEL = 2
 
 CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
-	-mcpu=cortex-m0 \
+	-mcpu=cortex-m0 -fno-short-enums \
 	--target=thumb -Wall -emit-llvm -nostdlib -ffreestanding -mfloat-abi=soft \
 	-ffunction-sections -fdata-sections -fno-builtin -fno-stack-protector \
 	-momit-leaf-frame-pointer -DNDEBUG \
