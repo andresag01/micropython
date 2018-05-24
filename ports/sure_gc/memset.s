@@ -95,8 +95,7 @@ __aeabi_memclr4:
 __aeabi_memclr8:
 
 
-	movs	r2, #0		@ fallthrough to memset4
-@	eors	r2, r2		@ fallthrough to memset4
+	eors	r2, r2		@ fallthrough to memset4
 
 
 @ void __aeabi_memset4(void *r0, size_t r1, int r2)
