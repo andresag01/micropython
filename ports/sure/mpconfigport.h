@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "utils.h"
 
 #define MICROPY_ALLOC_GC_STACK_SIZE         (64)
 #define MICROPY_ALLOC_PATH_MAX              (512)

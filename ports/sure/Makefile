@@ -24,7 +24,7 @@ SYSROOT = /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-non
 OPT_LEVEL = 2
 
 CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
-	-mcpu=cortex-m0 \
+	-mcpu=cortex-m0 -fno-short-enums \
 	--target=thumb -Wall -emit-llvm -nostdlib -ffreestanding -mfloat-abi=soft \
 	-ffunction-sections -fdata-sections -fno-builtin -fno-stack-protector \
 	-momit-leaf-frame-pointer -DNDEBUG \
