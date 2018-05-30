@@ -452,7 +452,9 @@ void *gc_alloc(size_t n_bytes, bool has_finaliser) {
         GC_EXIT();
         // nothing found!
         if (collected) {
-            return NULL;
+            /* Ran out of memory! */
+            printf("Out of memory!\n");
+            out_of_memory();
         }
         DEBUG_printf("gc_alloc(" UINT_FMT "): no free mem, triggering GC\n", n_bytes);
         gc_collect();
