@@ -43,10 +43,12 @@ static void aligned_memcpy(void * restrict dst0,
     char *dst = (char *)dst0;
     char *src = (char *)src0;
 
-    while (byteOffset--)
+    while (byteOffset && len0)
     {
         *dst++ = *src++;
         len0--;
+        byteOffset++;
+        byteOffset = byteOffset % 4;
     }
 
     /* Move the aligned blocks in word chunks */
@@ -122,7 +124,7 @@ static void aligned_back_memcpy(void *dst_void,
     /* Move the back unaligned portion in byte chunks */
     size_t byteOffset = ((uintptr_t)dst) & 3;
 
-    while (byteOffset--)
+    while (byteOffset-- && length)
     {
         *--dst = *--src;
         length--;
