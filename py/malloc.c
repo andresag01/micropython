@@ -71,9 +71,14 @@
 STATIC void *internal_realloc(void *ptr, size_t old_size, size_t new_size) {
     void *new_ptr = NULL;
 
+    if (new_size == 0)
+    {
+        return NULL;
+    }
+
     new_ptr = malloc(new_size);
-    if (new_size > 0 && old_size > 0) {
-        memcpy(new_ptr, ptr, old_size);
+    if (old_size > 0) {
+        memcpy(new_ptr, ptr, (old_size < new_size) ? old_size : new_size);
     }
 
     return new_ptr;
