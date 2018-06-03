@@ -58,7 +58,15 @@
 #define MICROPY_REPL_AUTO_INDENT            (0)
 #define MICROPY_HELPER_LEXER_UNIX           (0)
 
-#define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_NONE)
+//#define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_NONE)
+#define MICROPY_LONGINT_IMPL                (MICROPY_LONGINT_IMPL_MPZ)
+
+/*
+ * The headers we are using do not define SSIZE_MAX, but it "should" be the max
+ * positive value that fits into a signed 32 bit integer. That is the same as
+ * (2 ** 32 - 1) / 2 == SIZE_MAX / 2
+ */
+#define MP_SSIZE_MAX                        ((SIZE_MAX - 1) >> 1)
 
 #define MICROPY_ENABLE_SOURCE_LINE          (1)
 #define MICROPY_ENABLE_DOC_STRING           (0)
@@ -133,10 +141,10 @@
 #define MICROPY_PY_CMATH                        (1)
 #define MICROPY_PY_GC                           (0)
 #define MICROPY_PY_GC_COLLECT_RETVAL            (0)
-#define MICROPY_PY_IO                           (0)
+#define MICROPY_PY_IO                           (1)
 #define MICROPY_PY_IO_RESOURCE_STREAM           (0)
 #define MICROPY_PY_IO_FILEIO                    (0)
-#define MICROPY_PY_IO_BYTESIO                   (0)
+#define MICROPY_PY_IO_BYTESIO                   (1)
 #define MICROPY_PY_IO_BUFFEREDWRITER            (0)
 #define MICROPY_PY_STRUCT                       (1)
 #define MICROPY_PY_SYS                          (1)
@@ -155,7 +163,7 @@
 
 #define MICROPY_PY_UCTYPES                      (1)
 #define MICROPY_PY_UZLIB                        (1)
-#define MICROPY_PY_UJSON                        (0)
+#define MICROPY_PY_UJSON                        (1)
 #define MICROPY_PY_URE                          (1)
 #define MICROPY_PY_UHEAPQ                       (1)
 #define MICROPY_PY_UTIMEQ                       (0)
