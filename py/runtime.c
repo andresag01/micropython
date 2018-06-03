@@ -423,14 +423,17 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
                     lhs_val = mp_small_int_floor_divide(lhs_val, rhs_val);
                     break;
 
-                #if MICROPY_PY_BUILTINS_FLOAT
                 case MP_BINARY_OP_TRUE_DIVIDE:
                 case MP_BINARY_OP_INPLACE_TRUE_DIVIDE:
                     if (rhs_val == 0) {
                         goto zero_division;
                     }
+                #if MICROPY_PY_BUILTINS_FLOAT
                     return mp_obj_new_float((mp_float_t)lhs_val / (mp_float_t)rhs_val);
-                #endif
+                #else
+                    lhs_val = lhs_val / rhs_val;
+                    break;
+                #endif /* MICROPY_PY_BUILTINS_FLOAT */
 
                 case MP_BINARY_OP_MODULO:
                 case MP_BINARY_OP_INPLACE_MODULO: {
