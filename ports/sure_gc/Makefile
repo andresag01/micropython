@@ -13,6 +13,9 @@ QSTR_DEFS = qstrdefsport.h
 # include py core make definitions
 include $(TOP)/py/py.mk
 
+# Select the script to compile into the binary
+SELECT_SCRIPT ?= 1
+
 INC += -I.
 INC += -I$(TOP)
 INC += -I$(BUILD)
@@ -34,7 +37,8 @@ CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
 	-DMICROPY_USE_READLINE=$(MICROPY_PY_USE_READLINE) \
 	-DMICROPY_PY_SOCKET=$(MICROPY_PY_SOCKET) \
 	-DMICROPY_PY_THREAD_GIL=$(MICROPY_PY_THREAD_GIL) \
-	-DMICROPY_PY_WEBREPL=$(MICROPY_PY_WEBREPL)
+	-DMICROPY_PY_WEBREPL=$(MICROPY_PY_WEBREPL) \
+	-DSELECT_SCRIPT=$(SELECT_SCRIPT)
 LLCFLAGS = -mtriple=arm-none-eabi -march=thumb -float-abi=soft \
 	-function-sections -O$(OPT_LEVEL) -data-sections -disable-simplify-libcalls
 LDFLAGS = -static -nostdlib --gc-sections -T $(LDSCRIPT) -Map $(@:.elf=.map)
