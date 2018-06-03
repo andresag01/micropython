@@ -76,12 +76,12 @@ mp_obj_t mp_micropython_mem_info(size_t n_args, const mp_obj_t *args) {
 #else
     mp_printf(&mp_plat_print, "stack used bytes: " UINT_FMT "\n", mp_stack_usage());
 #endif
-#if 0 //MICROPY_ENABLE_GC
+#if MICROPY_ENABLE_GC
     gc_dump_info();
-    if (n_args == 1) {
-        // arg given means dump gc allocation table
-        gc_dump_alloc_table();
-    }
+    //if (n_args == 1) {
+    //    // arg given means dump gc allocation table
+    //    gc_dump_alloc_table();
+    //}
 #else
     (void)n_args;
 #endif
