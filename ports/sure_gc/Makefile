@@ -17,7 +17,8 @@ include $(TOP)/py/py.mk
 SELECT_SCRIPT ?= 1
 
 # Select memory size values for linker script
-RAM_SIZE ?= 900K
+RAM_SIZE ?= 900
+MIN_STACK_SIZE ?= 50
 
 INC += -I.
 INC += -I$(TOP)
@@ -50,7 +51,9 @@ ASFLAGS = -mthumb
 SIZEFLAGS = --format=sysv --radix=10
 READELFFLAGS ?= -a -teg
 OBJDUMPFLAGS ?= -h -C -S -s -d
-M4FLAGS = --define=RAM_SIZE=$(RAM_SIZE)
+# Do not set K to MIN_STACK_SIZE because its for startup.s
+M4FLAGS = --define=RAM_SIZE=$(RAM_SIZE)K \
+	--define=MIN_STACK_SIZE=$(MIN_STACK_SIZE)
 
 SRC_C = main.c utils.c printf.c
 SRC_S = startup.s sure_malloc.s idiv.s idivmod.s memset.s crt.s lmul.s ldivmod.s
@@ -58,6 +61,10 @@ SRC_S = startup.s sure_malloc.s idiv.s idivmod.s memset.s crt.s lmul.s ldivmod.s
 OBJ = $(addprefix $(BUILD)/, $(SRC_S:.s=.o) $(SRC_C:.c=.o)) $(PY_O)
 
 all: $(BUILD)/micropython.elf
+
+%.s: %.raw
+	$(ECHO) "M4 $<"
+	$(Q)$(M4) $(M4FLAGS) $< > $@
 
 $(BUILD)/micropython.elf: $(OBJ)
 	$(ECHO) "M4 $(LDSCRIPT)"

@@ -17,9 +17,9 @@ include $(TOP)/py/py.mk
 SELECT_SCRIPT ?= 1
 
 # Select memory size values for linker script
-RAM_SIZE       ?= 900K
-MIN_HEAP_SIZE  ?= 200K
-MIN_STACK_SIZE ?= 50K
+RAM_SIZE       ?= 900
+MIN_HEAP_SIZE  ?= 200
+MIN_STACK_SIZE ?= 50
 
 INC += -I.
 INC += -I$(TOP)
@@ -48,9 +48,9 @@ ASFLAGS = -mthumb
 SIZEFLAGS = --format=sysv --radix=10
 READELFFLAGS ?= -a -teg
 OBJDUMPFLAGS ?= -h -C -S -s -d
-M4FLAGS = --define=RAM_SIZE=$(RAM_SIZE) \
-	--define=MIN_HEAP_SIZE=$(MIN_HEAP_SIZE) \
-	--define=MIN_STACK_SIZE=$(MIN_STACK_SIZE)
+M4FLAGS = --define=RAM_SIZE=$(RAM_SIZE)K \
+	--define=MIN_HEAP_SIZE=$(MIN_HEAP_SIZE)K \
+	--define=MIN_STACK_SIZE=$(MIN_STACK_SIZE)K
 
 SRC_C = main.c utils.c dlmalloc.c printf.c gccollect.c
 SRC_S = startup.s idiv.s idivmod.s memset.s crt.s lmul.s ldivmod.s gchelpers.s

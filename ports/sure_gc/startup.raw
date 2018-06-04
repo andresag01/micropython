@@ -52,14 +52,14 @@ success:
         .global _start
 _start:
     /* Allocate 10KB of stack */
-    mov r0, #10
+    mov r0, `#'MIN_STACK_SIZE
     lsl r0, r0, #8
     wfi
     /*
      * Set the sp to the end of the object we just allocated (assume
      * descending stack)
      */
-    mov r1, #10
+    mov r1, `#'MIN_STACK_SIZE
     lsl r1, r1, #10
     add r0, r0, r1
     mov sp, r0
