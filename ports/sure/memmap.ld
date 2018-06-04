@@ -1,20 +1,18 @@
 /* memmap */
 MEMORY
 {
-    ram(WAIL) : ORIGIN = 0x00000000, LENGTH = 237K
+    ram(WAIL) : ORIGIN = 0x00000000, LENGTH = RAM_SIZE
 }
 
 ENTRY(_start)
 
 /* Set the minimum heap size */
-_min_heap_size = 30K;
+_min_heap_size = MIN_HEAP_SIZE;
 /* Set the minimum stack size */
-_min_stack_size = 10K;
+_min_stack_size = MIN_STACK_SIZE;
 
 _ram_start = ORIGIN(ram);
 _ram_end = ORIGIN(ram) + LENGTH(ram);
-
-_stack_end = ORIGIN(ram) + LENGTH(ram);
 
 SECTIONS
 {
@@ -88,5 +86,6 @@ SECTIONS
         . = . + _min_stack_size;
 
         . = ALIGN(4);
+        _stack_end = .;
     } > ram
 }

@@ -55,6 +55,7 @@ READELF = arm-none-eabi-readelf
 SIZE = arm-none-eabi-size
 STRIP = arm-none-eabi-strip
 AR = arm-none-eabi-ar
+M4 = m4
 ifeq ($(MICROPY_FORCE_32BIT),1)
 CC += -m32
 CXX += -m32

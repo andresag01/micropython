@@ -16,6 +16,11 @@ include $(TOP)/py/py.mk
 # Select the script to compile into the binary
 SELECT_SCRIPT ?= 1
 
+# Select memory size values for linker script
+RAM_SIZE       ?= 900K
+MIN_HEAP_SIZE  ?= 200K
+MIN_STACK_SIZE ?= 50K
+
 INC += -I.
 INC += -I$(TOP)
 INC += -I$(BUILD)
@@ -38,11 +43,14 @@ CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
 	-DSELECT_SCRIPT=$(SELECT_SCRIPT)
 LLCFLAGS = -mtriple=arm-none-eabi -march=thumb -float-abi=soft \
 	-function-sections -O$(OPT_LEVEL) -data-sections -disable-simplify-libcalls
-LDFLAGS = -static -nostdlib --gc-sections -T $(LDSCRIPT) -Map $(@:.elf=.map)
+LDFLAGS = -static -nostdlib --gc-sections -Map $(@:.elf=.map)
 ASFLAGS = -mthumb
 SIZEFLAGS = --format=sysv --radix=10
 READELFFLAGS ?= -a -teg
 OBJDUMPFLAGS ?= -h -C -S -s -d
+M4FLAGS = --define=RAM_SIZE=$(RAM_SIZE) \
+	--define=MIN_HEAP_SIZE=$(MIN_HEAP_SIZE) \
+	--define=MIN_STACK_SIZE=$(MIN_STACK_SIZE)
 
 SRC_C = main.c utils.c dlmalloc.c printf.c gccollect.c
 SRC_S = startup.s idiv.s idivmod.s memset.s crt.s lmul.s ldivmod.s gchelpers.s
@@ -52,8 +60,10 @@ OBJ = $(addprefix $(BUILD)/, $(SRC_S:.s=.o) $(SRC_C:.c=.o)) $(PY_O)
 all: $(BUILD)/micropython.elf
 
 $(BUILD)/micropython.elf: $(OBJ)
+	$(ECHO) "M4 $(LDSCRIPT)"
+	$(Q)$(M4) $(M4FLAGS) $(LDSCRIPT) > $(BUILD)/$(LDSCRIPT:.ld=.m4)
 	$(ECHO) "LINK $@"
-	$(Q)$(LD) $(LDFLAGS) -o $@ $^
+	$(Q)$(LD) $(LDFLAGS) -T $(BUILD)/$(LDSCRIPT:.ld=.m4) -o $@ $^
 	$(ECHO) "OBJCOPY $@"
 	$(Q)$(OBJCOPY) $@ -O binary $(@:.elf=.bin)
 	$(ECHO) "SIZE $@"
