@@ -23,7 +23,6 @@
 "    range_it = range(loops)\n"                                         \
 "\n"                                                                    \
 "    for _ in range_it:\n"                                              \
-"        # 400 unpackings\n"                                            \
 "        a, b, c, d, e, f, g, h, i, j = to_unpack\n"                    \
 "        a, b, c, d, e, f, g, h, i, j = to_unpack\n"                    \
 "        a, b, c, d, e, f, g, h, i, j = to_unpack\n"                    \
@@ -424,24 +423,25 @@
 "        a, b, c, d, e, f, g, h, i, j = to_unpack\n"                    \
 "        a, b, c, d, e, f, g, h, i, j = to_unpack\n"                    \
 "        a, b, c, d, e, f, g, h, i, j = to_unpack\n"                    \
-"\n"                                                                    \
-"        print(a, b, c, d, e, f, g, h, i, j)\n"                         \
 "\n"                                                                    \
 "\n"                                                                    \
 "def bench_tuple_unpacking(loops):\n"                                   \
 "    x = tuple(range(10))\n"                                            \
-"\n"                                                                    \
 "    return do_unpacking(loops, x)\n"                                   \
 "\n"                                                                    \
 "\n"                                                                    \
 "def bench_list_unpacking(loops):\n"                                    \
 "    x = list(range(10))\n"                                             \
-"\n"                                                                    \
 "    return do_unpacking(loops, x)\n"                                   \
 "\n"                                                                    \
 "\n"                                                                    \
-"bench_tuple_unpacking(10)\n"                                           \
-"bench_list_unpacking(10)\n"                                            \
+"def bench_all(loops):\n"                                               \
+"    bench_tuple_unpacking(10)\n"                                       \
+"    bench_list_unpacking(10)\n"                                        \
+"\n"                                                                    \
+"\n"                                                                    \
+"LOOPS = 1\n"                                                           \
+"bench_all(LOOPS)\n"                                                    \
 "sys.exit(0)"
 
 #elif SELECT_SCRIPT == 2
@@ -551,7 +551,9 @@
 "            if regex.search(string) is None:\n"                        \
 "                sys.exit(1)\n"                                         \
 "\n"                                                                    \
-"bench_regex_effbot(10)\n"                                              \
+"\n"                                                                    \
+"LOOPS = 1\n"                                                          \
+"bench_regex_effbot(LOOPS)\n"                                           \
 "sys.exit(0)"
 
 #elif SELECT_SCRIPT == 3
@@ -560,7 +562,9 @@
 #define PYTHON_SCRIPT                                                   \
 "import sys\n"                                                          \
 "\n"                                                                    \
-"expected = 10\n"                                                       \
+"\n"                                                                    \
+"DEFAULT_ARG = 6\n"                                                     \
+"\n"                                                                    \
 "\n"                                                                    \
 "def fannkuch(n):\n"                                                    \
 "    count = list(range(1, n + 1))\n"                                   \
@@ -602,17 +606,9 @@
 "        else:\n"                                                       \
 "            return max_flips\n"                                        \
 "\n"                                                                    \
-"def bench_fannkuch(n):\n"                                              \
-"    res = fannkuch(n)\n"                                               \
-"    print(res)\n"                                                      \
-"    if expected == res:\n"                                             \
-"        print(\"PASS\")\n"                                             \
-"        sys.exit(0)\n"                                                 \
-"    else:\n"                                                           \
-"        print(\"FAIL\")\n"                                             \
-"        sys.exit(1)\n"                                                 \
 "\n"                                                                    \
-"bench_fannkuch(6)"
+"fannkuch(DEFAULT_ARG)\n"                                               \
+"sys.exit(0)"
 
 #elif SELECT_SCRIPT == 4
 
@@ -700,6 +696,7 @@
 "        json.loads(obj)\n"                                             \
 "        json.loads(obj)\n"                                             \
 "        json.loads(obj)\n"                                             \
+"        json.loads(obj)\n"                                             \
 "\n"                                                                    \
 "\n"                                                                    \
 "json_dict = json.dumps(DICT)\n"                                        \
@@ -724,16 +721,14 @@
 "NESTED_DATA = {'key1': 0, 'key2': SIMPLE[0], 'key3': 'value',\n"       \
 "               'key4': SIMPLE[0],\n"                                   \
 "               'key5': SIMPLE[0], 'key': 'hello world'}\n"             \
-"NESTED = (NESTED_DATA, 10)\n"                                          \
-"HUGE = ([NESTED[0]] * 10, 1)\n"                                        \
+"NESTED = (NESTED_DATA, 100)\n"                                         \
+"HUGE = ([NESTED[0]] * 100, 1)\n"                                       \
 "\n"                                                                    \
 "\n"                                                                    \
 "def bench_json_dumps(data):\n"                                         \
 "    for obj, count_it in data:\n"                                      \
-"        print(obj)\n"                                                  \
 "        for _ in count_it:\n"                                          \
 "            s = json.dumps(obj)\n"                                     \
-"        print(s)\n"                                                    \
 "\n"                                                                    \
 "\n"                                                                    \
 "def main():\n"                                                         \
@@ -755,18 +750,6 @@
 #define PYTHON_SCRIPT                                                   \
 "import sys\n"                                                          \
 "\n"                                                                    \
-"expected = [\n"                                                        \
-"    (0, 2, 4, 1, 3),\n"                                                \
-"    (0, 3, 1, 4, 2),\n"                                                \
-"    (1, 3, 0, 2, 4),\n"                                                \
-"    (1, 4, 2, 0, 3),\n"                                                \
-"    (2, 0, 3, 1, 4),\n"                                                \
-"    (2, 4, 1, 3, 0),\n"                                                \
-"    (3, 0, 2, 4, 1),\n"                                                \
-"    (3, 1, 4, 2, 0),\n"                                                \
-"    (4, 1, 3, 0, 2),\n"                                                \
-"    (4, 2, 0, 3, 1)\n"                                                 \
-"]\n"                                                                   \
 "\n"                                                                    \
 "def permutations(iterable, r=None):\n"                                 \
 "    pool = tuple(iterable)\n"                                          \
@@ -800,24 +783,19 @@
 "\n"                                                                    \
 "\n"                                                                    \
 "def bench_n_queens(queen_count):\n"                                    \
-"    res = list(n_queens(queen_count))\n"                               \
-"    print(res)\n"                                                      \
-"    if expected == res:\n"                                             \
-"        print(\"PASS\")\n"                                             \
-"        sys.exit(0)\n"                                                 \
-"    else:\n"                                                           \
-"        print(\"FAIL\")\n"                                             \
-"        sys.exit(1)\n"                                                 \
+"    list(n_queens(queen_count))\n"                                     \
 "\n"                                                                    \
 "\n"                                                                    \
-"print(\"Starting python\")\n"                                          \
-"bench_n_queens(5)"
+"QUEEN_COUNT = 6\n"                                                     \
+"bench_n_queens(QUEEN_COUNT)\n"                                         \
+"sys.exit(0)"
 
 #elif SELECT_SCRIPT == 7
 
 /* bm_deltablue.py */
 #define PYTHON_SCRIPT                                                   \
 "import sys\n"                                                          \
+"\n"                                                                    \
 "\n"                                                                    \
 "class OrderedCollection(list):\n"                                      \
 "    pass\n"                                                            \
@@ -863,13 +841,13 @@
 "        return strengths[self.strength]\n"                             \
 "\n"                                                                    \
 "\n"                                                                    \
-"REQUIRED = Strength(0, \"required\")\n"                                \
-"STRONG_PREFERRED = Strength(1, \"strongPreferred\")\n"                 \
-"PREFERRED = Strength(2, \"preferred\")\n"                              \
-"STRONG_DEFAULT = Strength(3, \"strongDefault\")\n"                     \
-"NORMAL = Strength(4, \"normal\")\n"                                    \
-"WEAK_DEFAULT = Strength(5, \"weakDefault\")\n"                         \
-"WEAKEST = Strength(6, \"weakest\")\n"                                  \
+"REQUIRED = Strength(0, 'required')\n"                                  \
+"STRONG_PREFERRED = Strength(1, 'strongPreferred')\n"                   \
+"PREFERRED = Strength(2, 'preferred')\n"                                \
+"STRONG_DEFAULT = Strength(3, 'strongDefault')\n"                       \
+"NORMAL = Strength(4, 'normal')\n"                                      \
+"WEAK_DEFAULT = Strength(5, 'weakDefault')\n"                           \
+"WEAKEST = Strength(6, 'weakest')\n"                                    \
 "\n"                                                                    \
 "\n"                                                                    \
 "class Constraint:\n"                                                   \
@@ -889,6 +867,7 @@
 "        if not self.is_satisfied():\n"                                 \
 "            if self.strength == REQUIRED:\n"                           \
 "                print('Could not satisfy a required constraint!')\n"   \
+"                sys.exit(1)\n"                                         \
 "\n"                                                                    \
 "            return None\n"                                             \
 "\n"                                                                    \
@@ -903,6 +882,7 @@
 "\n"                                                                    \
 "        if not planner.add_propagate(self, mark):\n"                   \
 "            print('Cycle encountered')\n"                              \
+"            sys.exit(1)\n"                                             \
 "\n"                                                                    \
 "        out.mark = mark\n"                                             \
 "        return overridden\n"                                           \
@@ -1086,7 +1066,6 @@
 "        self.direction = Direction.NONE\n"                             \
 "        self.scale = scale\n"                                          \
 "        self.offset = offset\n"                                        \
-"\n"                                                                    \
 "        self.strength = strength\n"                                    \
 "        self.v1 = src\n"                                               \
 "        self.v2 = dest\n"                                              \
@@ -1097,7 +1076,6 @@
 "        self.v1.add_constraint(self)\n"                                \
 "        self.v2.add_constraint(self)\n"                                \
 "        self.direction = Direction.NONE\n"                             \
-"\n"                                                                    \
 "        self.scale.add_constraint(self)\n"                             \
 "        self.offset.add_constraint(self)\n"                            \
 "\n"                                                                    \
@@ -1186,7 +1164,6 @@
 "        constraint.remove_from_graph()\n"                              \
 "        unsatisfied = self.remove_propagate_from(out)\n"               \
 "        strength = REQUIRED\n"                                         \
-"        # Do-while, the Python way.\n"                                 \
 "        repeat = True\n"                                               \
 "\n"                                                                    \
 "        while repeat:\n"                                               \
@@ -1300,7 +1277,7 @@
 "    prev, first, last = None, None, None\n"                            \
 "\n"                                                                    \
 "    for i in range(n + 1):\n"                                          \
-"        name = \"v%s\" % i\n"                                          \
+"        name = 'v%s' % i\n"                                            \
 "        v = Variable(name)\n"                                          \
 "\n"                                                                    \
 "        if prev is not None:\n"                                        \
@@ -1325,21 +1302,22 @@
 "        plan.execute()\n"                                              \
 "\n"                                                                    \
 "        if last.value != i:\n"                                         \
-"            print(\"Chain test failed.\")\n"                           \
+"            print('Chain test failed.')\n"                             \
+"            sys.exit(1)\n"                                             \
 "\n"                                                                    \
 "\n"                                                                    \
 "def projection_test(n):\n"                                             \
 "    global planner\n"                                                  \
 "    planner = Planner()\n"                                             \
-"    scale = Variable(\"scale\", 10)\n"                                 \
-"    offset = Variable(\"offset\", 1000)\n"                             \
+"    scale = Variable('scale', 10)\n"                                   \
+"    offset = Variable('offset', 1000)\n"                               \
 "    src = None\n"                                                      \
 "\n"                                                                    \
 "    dests = OrderedCollection()\n"                                     \
 "\n"                                                                    \
 "    for i in range(n):\n"                                              \
-"        src = Variable(\"src%s\" % i, i)\n"                            \
-"        dst = Variable(\"dst%s\" % i, i)\n"                            \
+"        src = Variable('src%s' % i, i)\n"                              \
+"        dst = Variable('dst%s' % i, i)\n"                              \
 "        dests.append(dst)\n"                                           \
 "        StayConstraint(src, NORMAL)\n"                                 \
 "        ScaleConstraint(src, scale, offset, dst, REQUIRED)\n"          \
@@ -1347,24 +1325,28 @@
 "    change(src, 17)\n"                                                 \
 "\n"                                                                    \
 "    if dst.value != 1170:\n"                                           \
-"        print(\"Projection 1 failed\")\n"                              \
+"        print('Projection 1 failed')\n"                                \
+"        sys.exit(1)\n"                                                 \
 "\n"                                                                    \
 "    change(dst, 1050)\n"                                               \
 "\n"                                                                    \
 "    if src.value != 5:\n"                                              \
-"        print(\"Projection 2 failed\")\n"                              \
+"        print('Projection 2 failed')\n"                                \
+"        sys.exit(1)\n"                                                 \
 "\n"                                                                    \
 "    change(scale, 5)\n"                                                \
 "\n"                                                                    \
 "    for i in range(n - 1):\n"                                          \
 "        if dests[i].value != (i * 5 + 1000):\n"                        \
-"            print(\"Projection 3 failed\")\n"                          \
+"            print('Projection 3 failed')\n"                            \
+"            sys.exit(1)\n"                                             \
 "\n"                                                                    \
 "    change(offset, 2000)\n"                                            \
 "\n"                                                                    \
 "    for i in range(n - 1):\n"                                          \
 "        if dests[i].value != (i * 5 + 2000):\n"                        \
-"            print(\"Projection 4 failed\")\n"                          \
+"            print('Projection 4 failed')\n"                            \
+"            sys.exit(1)\n"                                             \
 "\n"                                                                    \
 "\n"                                                                    \
 "def change(v, new_value):\n"                                           \
@@ -1386,12 +1368,12 @@
 "\n"                                                                    \
 "\n"                                                                    \
 "def delta_blue(n):\n"                                                  \
-"    print(\"Starting chain_test()\")\n"                                \
 "    chain_test(n)\n"                                                   \
-"    print(\"Starting projection_test()\")\n"                           \
 "    projection_test(n)\n"                                              \
 "\n"                                                                    \
-"delta_blue(10)\n"                                                      \
+"\n"                                                                    \
+"N = 75\n"                                                              \
+"delta_blue(N)\n"                                                       \
 "sys.exit(0)"
 
 #elif SELECT_SCRIPT == 8
@@ -1400,7 +1382,9 @@
 #define PYTHON_SCRIPT                                                   \
 "import sys\n"                                                          \
 "\n"                                                                    \
+"\n"                                                                    \
 "SOLVE_ARG = 5\n"                                                       \
+"LOOPS = 1\n"                                                           \
 "\n"                                                                    \
 "WIDTH, HEIGHT = 5, 10\n"                                               \
 "DIR_NO = 6\n"                                                          \
@@ -1430,7 +1414,7 @@
 "    ps = [ido]\n"                                                      \
 "    for r in range(DIR_NO - 1):\n"                                     \
 "        ps.append(rotate(ps[-1]))\n"                                   \
-"        if ido == r_ido:                 # C2-symmetry\n"              \
+"        if ido == r_ido:\n"                                            \
 "            ps = ps[0:DIR_NO // 2]\n"                                  \
 "    for pp in ps[:]:\n"                                                \
 "        ps.append(flip(pp))\n"                                         \
@@ -1544,7 +1528,7 @@
 "    se_nh = get_senh(board, cti)\n"                                    \
 "\n"                                                                    \
 "    solve_arg = SOLVE_ARG\n"                                           \
-"    bench_meteor_contest(1, board, pieces, solve_arg, fps, se_nh)\n"   \
+"    bench_meteor_contest(LOOPS, board, pieces, solve_arg, fps, se_nh)\n" \
 "\n"                                                                    \
 "\n"                                                                    \
 "main()\n"                                                              \
@@ -1556,7 +1540,9 @@
 #define PYTHON_SCRIPT                                                   \
 "import sys\n"                                                          \
 "\n"                                                                    \
-"DEFAULT_LEVEL = 2\n"                                                   \
+"\n"                                                                    \
+"DEFAULT_LEVEL = 25\n"                                                  \
+"LOOPS = 1\n"                                                           \
 "\n"                                                                    \
 "\n"                                                                    \
 "class Dir(object):\n"                                                  \
@@ -1705,14 +1691,12 @@
 "            raise Exception(\"Wrong strategy: %d\" % strategy)\n"      \
 "\n"                                                                    \
 "\n"                                                                    \
-"\n"                                                                    \
 "class Node(object):\n"                                                 \
 "\n"                                                                    \
 "    def __init__(self, pos, id, links):\n"                             \
 "        self.pos = pos\n"                                              \
 "        self.id = id\n"                                                \
 "        self.links = links\n"                                          \
-"\n"                                                                    \
 "\n"                                                                    \
 "\n"                                                                    \
 "class Hex(object):\n"                                                  \
@@ -1767,7 +1751,6 @@
 "\n"                                                                    \
 "    def clone(self):\n"                                                \
 "        return Pos(self.hex, self.tiles, self.done.clone())\n"         \
-"\n"                                                                    \
 "\n"                                                                    \
 "\n"                                                                    \
 "def constraint_pass(pos, last_move=None):\n"                           \
@@ -1856,7 +1839,6 @@
 "    if order == ASCENDING:\n"                                          \
 "        return [(cell_id, v) for v in done[cell_id]]\n"                \
 "    else:\n"                                                           \
-"        # Try higher values first and EMPTY last\n"                    \
 "        moves = list(reversed([(cell_id, v)\n"                         \
 "                               for v in done[cell_id] if v != EMPTY]))\n" \
 "        if EMPTY in done[cell_id]:\n"                                  \
@@ -1899,7 +1881,7 @@
 "                c = '?'\n"                                             \
 "            string += '%s ' % c\n"                                     \
 "        result.append(string)\n"                                       \
-"        string += ''\n"                                                \
+"        string = ''\n"                                                 \
 "\n"                                                                    \
 "\n"                                                                    \
 "OPEN = 0\n"                                                            \
@@ -1985,155 +1967,157 @@
 "        else:\n"                                                       \
 "            tiles[i] = 0\n"                                            \
 "    if tot != hex.count:\n"                                            \
-"        raise Exception(\n"                                                \
+"        raise Exception(\n"                                            \
 "            'Invalid input. Expected %d tiles, got %d.' % (hex.count, tot))\n" \
-"\n" \
-"\n" \
-"def solve(pos, strategy, order, output):\n" \
-"    check_valid(pos)\n" \
-"    return solve_step(pos, strategy, order, output, first=True)\n" \
-"\n" \
-"\n" \
-"def read_file(file):\n" \
-"    lines = file\n" \
-"    size = int(lines[0])\n" \
-"    hex = Hex(size)\n" \
-"    linei = 1\n" \
-"    tiles = 8 * [0]\n" \
-"    done = Done(hex.count)\n" \
-"    for y in range(size):\n" \
-"        line = lines[linei][size - y - 1:]\n" \
-"        p = 0\n" \
-"        for x in range(size + y):\n" \
-"            tile = line[p:p + 2]\n" \
-"            p += 2\n" \
-"            if tile[1] == '.':\n" \
-"                inctile = EMPTY\n" \
-"            else:\n" \
-"                inctile = int(tile)\n" \
-"            tiles[inctile] += 1\n" \
-"            if tile[0] == '+':\n" \
-"                done.set_done(hex.get_by_pos((x, y)).id, inctile)\n" \
-"\n" \
-"        linei += 1\n" \
-"    for y in range(1, size):\n" \
-"        ry = size - 1 + y\n" \
-"        line = lines[linei][y:]\n" \
-"        p = 0\n" \
-"        for x in range(y, size * 2 - 1):\n" \
-"            tile = line[p:p + 2]\n" \
-"            p += 2\n" \
-"            if tile[1] == '.':\n" \
-"                inctile = EMPTY\n" \
-"            else:\n" \
-"                inctile = int(tile)\n" \
-"            tiles[inctile] += 1\n" \
-"            # Look for locked tiles\n" \
-"            if tile[0] == '+':\n" \
-"                done.set_done(hex.get_by_pos((x, ry)).id, inctile)\n" \
-"        linei += 1\n" \
-"    hex.link_nodes()\n" \
-"    done.filter_tiles(tiles)\n" \
-"    return Pos(hex, tiles, done)\n" \
-"\n" \
-"\n" \
-"def solve_file(file, strategy, order, output):\n" \
-"    pos = read_file(file)\n" \
-"    solve(pos, strategy, order, output)\n" \
-"\n" \
-"\n" \
-"LEVELS = {}\n" \
-"\n" \
-"LEVELS[2] = [\n" \
-"['2',\n" \
-"'  . 1',\n" \
-"' . 1 1',\n" \
-"'  1 .'],\n" \
-"[' 1 1',\n" \
-"'. . .',\n" \
-"' 1 1']\n" \
-"]\n" \
-"\n" \
-"LEVELS[10] = [\n" \
-"['3',\n" \
-"'  +.+. .',\n" \
-"' +. 0 . 2',\n" \
-"' . 1+2 1 .',\n" \
-"'  2 . 0+.',\n" \
-"'   .+.+.'],\n" \
-"['  . . 1',\n" \
-"' . 1 . 2',\n" \
-"'0 . 2 2 .',\n" \
-"' . . . .',\n" \
-"'  0 . .']\n" \
-"]\n" \
-"\n" \
-"LEVELS[20] = [\n" \
-"['3',\n" \
-"'   . 5 4',\n" \
-"'  . 2+.+1',\n" \
-"' . 3+2 3 .',\n" \
-"' +2+. 5 .',\n" \
-"'   . 3 .'],\n" \
-"['  3 3 2',\n" \
-"' 4 5 . 1',\n" \
-"'3 5 2 . .',\n" \
-"' 2 . . .',\n" \
-"'  . . .']\n" \
-"]\n" \
-"\n" \
-"LEVELS[25] = [\n" \
-"['3',\n" \
-"'   4 . .',\n" \
-"'  . . 2 .',\n" \
-"' 4 3 2 . 4',\n" \
-"'  2 2 3 .',\n" \
-"'   4 2 4'],\n" \
-"['  3 4 2',\n" \
-"' 2 4 4 .',\n" \
-"'. . . 4 2',\n" \
-"' . 2 4 3',\n" \
-"'  . 2 .']\n" \
-"]\n" \
-"\n" \
-"LEVELS[30] = [\n" \
-"['4',\n" \
-"'    5 5 . .',\n" \
-"'   3 . 2+2 6',\n" \
-"'  3 . 2 . 5 .',\n" \
-"' . 3 3+4 4 . 3',\n" \
-"'  4 5 4 . 5 4',\n" \
-"'   5+2 . . 3',\n" \
-"'    4 . . .'],\n" \
-"['   3 4 3 .',\n" \
-"'  4 6 5 2 .',\n" \
-"' 2 5 5 . . 2',\n" \
-"'. . 5 4 . 4 3',\n" \
-"' . 3 5 4 5 4',\n" \
-"'  . 2 . 3 3',\n" \
-"'   . . . .']\n" \
-"]\n" \
-"\n" \
-"LEVELS[36] = [\n" \
-"['4',\n" \
-"'    2 1 1 2',\n" \
-"'   3 3 3 . .',\n" \
-"'  2 3 3 . 4 .',\n" \
-"' . 2 . 2 4 3 2',\n" \
-"'  2 2 . . . 2',\n" \
-"'   4 3 4 . .',\n" \
-"'    3 2 3 3'],\n" \
-"['   3 4 3 2',\n" \
-"'  3 4 4 . 3',\n" \
-"' 2 . . 3 4 3',\n" \
-"'2 . 1 . 3 . 2',\n" \
-"' 3 3 . 2 . 2',\n" \
-"'  3 . 2 . 2',\n" \
-"'   2 2 . 1']\n" \
-"]\n" \
-"\n" \
-"\n" \
+"\n"                                                                    \
+"\n"                                                                    \
+"def solve(pos, strategy, order, output):\n"                            \
+"    check_valid(pos)\n"                                                \
+"    return solve_step(pos, strategy, order, output, first=True)\n"     \
+"\n"                                                                    \
+"\n"                                                                    \
+"def read_file(file):\n"                                                \
+"    lines = file\n"                                                    \
+"    size = int(lines[0])\n"                                            \
+"    hex = Hex(size)\n"                                                 \
+"    linei = 1\n"                                                       \
+"    tiles = 8 * [0]\n"                                                 \
+"    done = Done(hex.count)\n"                                          \
+"    for y in range(size):\n"                                           \
+"        line = lines[linei][size - y - 1:]\n"                          \
+"        p = 0\n"                                                       \
+"        for x in range(size + y):\n"                                   \
+"            tile = line[p:p + 2]\n"                                    \
+"            p += 2\n"                                                  \
+"            if tile[1] == '.':\n"                                      \
+"                inctile = EMPTY\n"                                     \
+"            else:\n"                                                   \
+"                inctile = int(tile)\n"                                 \
+"            tiles[inctile] += 1\n"                                     \
+"            if tile[0] == '+':\n"                                      \
+"                done.set_done(hex.get_by_pos((x, y)).id, inctile)\n"   \
+"\n"                                                                    \
+"        linei += 1\n"                                                  \
+"    for y in range(1, size):\n"                                        \
+"        ry = size - 1 + y\n"                                           \
+"        line = lines[linei][y:]\n"                                     \
+"        p = 0\n"                                                       \
+"        for x in range(y, size * 2 - 1):\n"                            \
+"            tile = line[p:p + 2]\n"                                    \
+"            p += 2\n"                                                  \
+"            if tile[1] == '.':\n"                                      \
+"                inctile = EMPTY\n"                                     \
+"            else:\n"                                                   \
+"                inctile = int(tile)\n"                                 \
+"            tiles[inctile] += 1\n"                                     \
+"            # Look for locked tiles\n"                                 \
+"            if tile[0] == '+':\n"                                      \
+"                done.set_done(hex.get_by_pos((x, ry)).id, inctile)\n"  \
+"        linei += 1\n"                                                  \
+"    hex.link_nodes()\n"                                                \
+"    done.filter_tiles(tiles)\n"                                        \
+"    return Pos(hex, tiles, done)\n"                                    \
+"\n"                                                                    \
+"\n"                                                                    \
+"def solve_file(file, strategy, order, output):\n"                      \
+"    pos = read_file(file)\n"                                           \
+"    solve(pos, strategy, order, output)\n"                             \
+"\n"                                                                    \
+"\n"                                                                    \
+"LEVELS = {}\n"                                                         \
+"\n"                                                                    \
+"LEVELS[2] = [\n"                                                       \
+"['2',\n"                                                               \
+"'  . 1',\n"                                                            \
+"' . 1 1',\n"                                                           \
+"'  1 .'],\n"                                                           \
+"[' 1 1',\n"                                                            \
+"'. . .',\n"                                                            \
+"' 1 1']\n"                                                             \
+"]\n"                                                                   \
+"\n"                                                                    \
+"LEVELS[10] = [\n"                                                      \
+"['3',\n"                                                               \
+"'  +.+. .',\n"                                                         \
+"' +. 0 . 2',\n"                                                        \
+"' . 1+2 1 .',\n"                                                       \
+"'  2 . 0+.',\n"                                                        \
+"'   .+.+.'],\n"                                                        \
+"['  . . 1',\n"                                                         \
+"' . 1 . 2',\n"                                                         \
+"'0 . 2 2 .',\n"                                                        \
+"' . . . .',\n"                                                         \
+"'  0 . .']\n"                                                          \
+"]\n"                                                                   \
+"\n"                                                                    \
+"LEVELS[20] = [\n"                                                      \
+"['3',\n"                                                               \
+"'   . 5 4',\n"                                                         \
+"'  . 2+.+1',\n"                                                        \
+"' . 3+2 3 .',\n"                                                       \
+"' +2+. 5 .',\n"                                                        \
+"'   . 3 .'],\n"                                                        \
+"['  3 3 2',\n"                                                         \
+"' 4 5 . 1',\n"                                                         \
+"'3 5 2 . .',\n"                                                        \
+"' 2 . . .',\n"                                                         \
+"'  . . .']\n"                                                          \
+"]\n"                                                                   \
+"\n"                                                                    \
+"LEVELS[25] = [\n"                                                      \
+"['3',\n"                                                               \
+"'   4 . .',\n"                                                         \
+"'  . . 2 .',\n"                                                        \
+"' 4 3 2 . 4',\n"                                                       \
+"'  2 2 3 .',\n"                                                        \
+"'   4 2 4'],\n"                                                        \
+"['  3 4 2',\n"                                                         \
+"' 2 4 4 .',\n"                                                         \
+"'. . . 4 2',\n"                                                        \
+"' . 2 4 3',\n"                                                         \
+"'  . 2 .']\n"                                                          \
+"]\n"                                                                   \
+"\n"                                                                    \
+"LEVELS[30] = [\n"                                                      \
+"['4',\n"                                                               \
+"'    5 5 . .',\n"                                                      \
+"'   3 . 2+2 6',\n"                                                     \
+"'  3 . 2 . 5 .',\n"                                                    \
+"' . 3 3+4 4 . 3',\n"                                                   \
+"'  4 5 4 . 5 4',\n"                                                    \
+"'   5+2 . . 3',\n"                                                     \
+"'    4 . . .'],\n"                                                     \
+"['   3 4 3 .',\n"                                                      \
+"'  4 6 5 2 .',\n"                                                      \
+"' 2 5 5 . . 2',\n"                                                     \
+"'. . 5 4 . 4 3',\n"                                                    \
+"' . 3 5 4 5 4',\n"                                                     \
+"'  . 2 . 3 3',\n"                                                      \
+"'   . . . .']\n"                                                       \
+"]\n"                                                                   \
+"\n"                                                                    \
+"LEVELS[36] = [\n"                                                      \
+"['4',\n"                                                               \
+"'    2 1 1 2',\n"                                                      \
+"'   3 3 3 . .',\n"                                                     \
+"'  2 3 3 . 4 .',\n"                                                    \
+"' . 2 . 2 4 3 2',\n"                                                   \
+"'  2 2 . . . 2',\n"                                                    \
+"'   4 3 4 . .',\n"                                                     \
+"'    3 2 3 3'],\n"                                                     \
+"['   3 4 3 2',\n"                                                      \
+"'  3 4 4 . 3',\n"                                                      \
+"' 2 . . 3 4 3',\n"                                                     \
+"'2 . 1 . 3 . 2',\n"                                                    \
+"' 3 3 . 2 . 2',\n"                                                     \
+"'  3 . 2 . 2',\n"                                                      \
+"'   2 2 . 1']\n"                                                       \
+"]\n"                                                                   \
+"\n"                                                                    \
+"\n"                                                                    \
 "result = []\n"                                                         \
+"\n"                                                                    \
+"\n"                                                                    \
 "def main(loops, level):\n"                                             \
 "    global result\n"                                                   \
 "    board, solution = LEVELS[level]\n"                                 \
@@ -2156,7 +2140,7 @@
 "        sys.exit(1)\n"                                                 \
 "\n"                                                                    \
 "\n"                                                                    \
-"main(1, DEFAULT_LEVEL)\n"                                              \
+"main(LOOPS, DEFAULT_LEVEL)\n"                                          \
 "sys.exit(0)"
 
 #elif SELECT_SCRIPT == 10
@@ -2168,7 +2152,6 @@
 "\n" \
 "\n" \
 "file_cnt = None\n" \
-"print('joining string')\n" \
 "data = [\n" \
 "chr(66), chr(90), chr(104), chr(57), chr(49), chr(65), chr(89), chr(38), chr(83),\n" \
 "chr(89), chr(91), chr(250), chr(50), chr(16), chr(0), chr(0), chr(124),\n" \
@@ -2239,6 +2222,7 @@
 "chr(200), chr(64)]\n" \
 "data = ''.join(data)\n" \
 "\n" \
+"\n" \
 "class BitfieldBase(object):\n" \
 "\n" \
 "    def __init__(self, x, isBitfieldBase):\n" \
@@ -2284,7 +2268,6 @@
 "            n -= len(self._read(n >> 3)) << 3\n" \
 "        if n:\n" \
 "            self.readbits(n)\n" \
-"        # No return value\n" \
 "\n" \
 "    def dropbytes(self, n=1):\n" \
 "        self.dropbits(n << 3)\n" \
@@ -2507,7 +2490,6 @@
 "\n" \
 "\n" \
 "def bwt_transform(L):\n" \
-"    # Semi-inefficient way to get the character counts\n" \
 "    F = ''.join(sorted(L))\n" \
 "    base = []\n" \
 "    for i in range(256):\n" \
@@ -2558,7 +2540,6 @@
 "    mtf = list(range(huffman_groups))\n" \
 "    selectors_list = []\n" \
 "    for i in range(selectors_used):\n" \
-"        # zero-terminated bit runs (0..62) of MTF'ed huffman table\n" \
 "        c = 0\n" \
 "        while b.readbits(1):\n" \
 "            c += 1\n" \
@@ -2604,7 +2585,7 @@
 "        raise Exception('Bzip2: Number of Huffman groups not in range 2..6')\n" \
 "\n" \
 "    selectors_list = compute_selectors_list(b, huffman_groups)\n" \
-"    symbols_in_use = sum(used) + 2  # remember RUN[AB] RLE symbols\n" \
+"    symbols_in_use = sum(used) + 2\n" \
 "    tables = compute_tables(b, huffman_groups, symbols_in_use)\n" \
 "\n" \
 "    favourites = [chr(i) for i, x in enumerate(used) if x]\n" \
@@ -2668,10 +2649,10 @@
 "    out = []\n" \
 "    while True:\n" \
 "        blocktype = b.readbits(48)\n" \
-"        b.readbits(32)   # crc\n" \
-"        if blocktype == 0x314159265359:  # (pi)\n" \
+"        b.readbits(32)\n" \
+"        if blocktype == 0x314159265359:\n" \
 "            decode_huffman_block(b, out)\n" \
-"        elif blocktype == 0x177245385090:  # sqrt(pi)\n" \
+"        elif blocktype == 0x177245385090:\n" \
 "            b.align()\n" \
 "            break\n" \
 "        else:\n" \
@@ -2685,22 +2666,21 @@
 "    if method != 8:\n" \
 "        raise Exception('Unknown (not type eight DEFLATE) compression method')\n" \
 "\n" \
-"    # Use flags, drop modification time, extra flags and OS creator type.\n" \
 "    flags = b.readbits(8)\n" \
-"    b.readbits(32)   # mtime\n" \
-"    b.readbits(8)    # extra_flags\n" \
-"    b.readbits(8)    # os_type\n" \
+"    b.readbits(32)\n" \
+"    b.readbits(8)\n" \
+"    b.readbits(8)\n" \
 "\n" \
-"    if flags & 0x04:  # structured GZ_FEXTRA miscellaneous data\n" \
+"    if flags & 0x04:\n" \
 "        xlen = b.readbits(16)\n" \
 "        b.dropbytes(xlen)\n" \
-"    while flags & 0x08:  # original GZ_FNAME filename\n" \
+"    while flags & 0x08:\n" \
 "        if not b.readbits(8):\n" \
 "            break\n" \
-"    while flags & 0x10:  # human readable GZ_FCOMMENT\n" \
+"    while flags & 0x10:\n" \
 "        if not b.readbits(8):\n" \
 "            break\n" \
-"    if flags & 0x02:  # header-only GZ_FHCRC checksum\n" \
+"    if flags & 0x02:\n" \
 "        b.readbits(16)\n" \
 "\n" \
 "    out = []\n" \
@@ -2716,17 +2696,17 @@
 "            for i in range(length):\n" \
 "                out.append(chr(b.readbits(8)))\n" \
 "\n" \
-"        elif blocktype == 1 or blocktype == 2:  # Huffman\n" \
+"        elif blocktype == 1 or blocktype == 2:\n" \
 "            main_literals, main_distances = None, None\n" \
 "\n" \
-"            if blocktype == 1:  # Static Huffman\n" \
+"            if blocktype == 1:\n" \
 "                static_huffman_bootstrap = [\n" \
 "                    (0, 8), (144, 9), (256, 7), (280, 8), (288, -1)]\n" \
 "                static_huffman_lengths_bootstrap = [(0, 5), (32, -1)]\n" \
 "                main_literals = HuffmanTable(static_huffman_bootstrap)\n" \
 "                main_distances = HuffmanTable(static_huffman_lengths_bootstrap)\n" \
 "\n" \
-"            elif blocktype == 2:  # Dynamic Huffman\n" \
+"            elif blocktype == 2:\n" \
 "                literals = b.readbits(5) + 257\n" \
 "                distances = b.readbits(5) + 1\n" \
 "                code_lengths_length = b.readbits(4) + 4\n" \
@@ -2743,18 +2723,16 @@
 "                n = 0\n" \
 "                while n < (literals + distances):\n" \
 "                    r = dynamic_codes.find_next_symbol(b)\n" \
-"                    if 0 <= r <= 15:  # literal bitlength for this code\n" \
+"                    if 0 <= r <= 15:\n" \
 "                        count = 1\n" \
 "                        what = r\n" \
-"                    elif r == 16:  # repeat last code\n" \
+"                    elif r == 16:\n" \
 "                        count = 3 + b.readbits(2)\n" \
-"                        # Is this supposed to default to '0' if in the zeroth\n" \
-"                        # position?\n" \
 "                        what = code_lengths[-1]\n" \
-"                    elif r == 17:  # repeat zero\n" \
+"                    elif r == 17:\n" \
 "                        count = 3 + b.readbits(3)\n" \
 "                        what = 0\n" \
-"                    elif r == 18:  # repeat zero lots\n" \
+"                    elif r == 18:\n" \
 "                        count = 11 + b.readbits(7)\n" \
 "                        what = 0\n" \
 "                    else:\n" \
@@ -2765,8 +2743,6 @@
 "\n" \
 "                main_literals = OrderedHuffmanTable(code_lengths[:literals])\n" \
 "                main_distances = OrderedHuffmanTable(code_lengths[literals:])\n" \
-"\n" \
-"            # Common path for both Static and Dynamic Huffman decode now\n" \
 "\n" \
 "            main_literals.populate_huffman_symbols()\n" \
 "            main_distances.populate_huffman_symbols()\n" \
@@ -2784,7 +2760,7 @@
 "                    if literal_count > 0:\n" \
 "                        literal_count = 0\n" \
 "                    break\n" \
-"                elif 257 <= r <= 285:  # dictionary lookup\n" \
+"                elif 257 <= r <= 285:\n" \
 "                    if literal_count > 0:\n" \
 "                        literal_count = 0\n" \
 "                    length_extra = b.readbits(extra_length_bits(r))\n" \
@@ -2814,8 +2790,8 @@
 "            break\n" \
 "\n" \
 "    b.align()\n" \
-"    b.readbits(32)   # crc\n" \
-"    b.readbits(32)   # final_length\n" \
+"    b.readbits(32)\n" \
+"    b.readbits(32)\n" \
 "    return ''.join(out)\n" \
 "\n" \
 "\n" \
@@ -2830,9 +2806,9 @@
 "        field = RBitfield(data, False)\n" \
 "\n" \
 "        magic = field.readbits(16)\n" \
-"        if magic == 0x1f8b:  # GZip\n" \
+"        if magic == 0x1f8b:\n" \
 "            out = gzip_main(field)\n" \
-"        elif magic == 0x425a:  # BZip2\n" \
+"        elif magic == 0x425a:\n" \
 "            out = bzip2_main(field)\n" \
 "        else:\n" \
 "            raise Exception('Unknown file magic %x, not a gzip/bzip2 file'\n" \
@@ -2855,7 +2831,8 @@
 "        raise Exception('MD5 checksum mismatch')\n" \
 "\n" \
 "\n" \
-"bench_pyflake(1)\n" \
+"LOOPS = 1\n" \
+"bench_pyflake(LOOPS)\n" \
 "sys.exit(0)"
 
 #else
