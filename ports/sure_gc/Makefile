@@ -5,6 +5,8 @@ MICROPY_PY_THREAD_GIL = 0
 MICROPY_PY_USE_READLINE = 0
 MICROPY_PY_WEBREPL = 0
 
+LLVM ?= /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin
+
 include ../../py/mkenv.mk
 
 # qstr definitions (must come before including py.mk)
@@ -25,8 +27,7 @@ INC += -I$(TOP)
 INC += -I$(BUILD)
 
 LDSCRIPT = memmap.ld
-#SYSROOT = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/lib/clang/7.0.0/include
-SYSROOT = /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-none-eabi/include
+SYSROOT_DIR ?= /usr/local/Cellar/arm-none-eabi-gcc/7-2017-q4-major/gcc/bin/../arm-none-eabi/include
 
 LDSCRIPT = memmap.ld
 PFLAGS_SCRIPT ?= ./scripts/get_code_pflags.py
@@ -34,8 +35,8 @@ SORT_READELF_SCRIPT ?= ./scripts/sort_readelf.py
 
 OPT_LEVEL = 2
 
-CFLAGS = $(INC) -isystem $(SYSROOT) --sysroot $(SYSROOT) -O$(OPT_LEVEL) \
-	-mcpu=cortex-m0 -fno-short-enums \
+CFLAGS = $(INC) -isystem $(SYSROOT_DIR) --sysroot $(SYSROOT_DIR) \
+	-O$(OPT_LEVEL) -mcpu=cortex-m0 -fno-short-enums \
 	--target=thumb -Wall -emit-llvm -nostdlib -ffreestanding -mfloat-abi=soft \
 	-ffunction-sections -fdata-sections -fno-builtin -fno-stack-protector \
 	-momit-leaf-frame-pointer -DNDEBUG \

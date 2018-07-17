@@ -45,9 +45,9 @@ SED = sed
 PYTHON = python
 
 AS = arm-none-eabi-as
-CC = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin/clang
-LLC = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin/llc
-CXX = /Users/andresag/Documents/repos/llvm_repos_unpatched/llvm/build/bin/clang++
+CC ?= $(LLVM)/clang
+LLC ?= $(LLVM)/llc
+CXX ?= $(LLVM)/clang++
 LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
