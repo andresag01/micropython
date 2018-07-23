@@ -45,9 +45,10 @@ SED = sed
 PYTHON = python
 
 AS = arm-none-eabi-as
-CC ?= $(LLVM)/clang
-LLC ?= $(LLVM)/llc
-CXX ?= $(LLVM)/clang++
+CPP = $(LLVM)/clang -E
+CC = $(LLVM)/clang
+LLC = $(LLVM)/llc
+CXX = $(LLVM)/clang++
 LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
