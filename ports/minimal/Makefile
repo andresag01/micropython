@@ -2,6 +2,21 @@ include ../../py/mkenv.mk
 
 CROSS = 0
 
+FROZEN_DIR = frozen
+
+FROZEN_SCRIPTS = $(FROZEN_DIR)/frozentest.py	\
+	$(FROZEN_DIR)/bm_nqueens.py					\
+	$(FROZEN_DIR)/bm_deltablue.py				\
+	$(FROZEN_DIR)/bm_fannkuch.py				\
+	$(FROZEN_DIR)/bm_hexion.py					\
+	$(FROZEN_DIR)/bm_json_dumps.py				\
+	$(FROZEN_DIR)/bm_json_loads.py				\
+	$(FROZEN_DIR)/bm_meteor_contest.py			\
+	$(FROZEN_DIR)/bm_unpack_sequence.py			\
+	$(FROZEN_DIR)/bm_nqueens.py					\
+	$(FROZEN_DIR)/bm_pyflate.py					\
+	$(FROZEN_DIR)/bm_regex_effbot.py
+
 # qstr definitions (must come before including py.mk)
 QSTR_DEFS = qstrdefsport.h
 
@@ -20,12 +35,13 @@ ifeq ($(CROSS), 1)
 DFU = $(TOP)/tools/dfu.py
 PYDFU = $(TOP)/tools/pydfu.py
 CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mabi=aapcs-linux -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion
-CFLAGS = $(INC) -Wall -Werror -std=c99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
+CFLAGS = $(INC) -Wall -Werror -Werror=vla -std=c99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
 LDFLAGS = -nostdlib -T stm32f405.ld -Map=$@.map --cref --gc-sections
 else
 LD = gcc
-CFLAGS = -m32 $(INC) -Wall -Werror -std=c99 $(COPT)
-LDFLAGS = -m32 -Wl,-Map=$@.map,--cref -Wl,--gc-sections
+CFLAGS = $(INC) -Wall -Werror -Werror=vla -std=c99 $(COPT)
+LDFLAGS = -Wl,-Map=$@.map,--cref -Wl,--gc-sections
+MPTFLAGS = -f -mlongint-impl=mpz -mmpz-dig-size=32
 endif
 
 # Tune for Debugging or Optimization
@@ -41,14 +57,12 @@ LIBS =
 SRC_C = \
 	main.c \
 	uart_core.c \
-	lib/utils/printf.c \
 	lib/utils/stdout_helpers.c \
 	lib/utils/pyexec.c \
 	lib/libc/string0.c \
-	lib/mp-readline/readline.c \
 	$(BUILD)/_frozen_mpy.c \
 
-OBJ = $(PY_CORE_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
+OBJ = $(PY_O) $(addprefix $(BUILD)/,$(SRC_C:.c=.o))
 
 ifeq ($(CROSS), 1)
 all: $(BUILD)/firmware.dfu
@@ -56,12 +70,16 @@ else
 all: $(BUILD)/firmware.elf
 endif
 
-$(BUILD)/_frozen_mpy.c: frozentest.mpy $(BUILD)/genhdr/qstrdefs.generated.h
-	$(ECHO) "MISC freezing bytecode"
-	$(Q)$(TOP)/tools/mpy-tool.py -f -q $(BUILD)/genhdr/qstrdefs.preprocessed.h -mlongint-impl=none $< > $@
+%.mpy: %.py
+	$(ECHO) "MPC $<"
+	$(Q)$(TOP)/mpy-cross/mpy-cross -X emit=bytecode -o $@ $<
+
+$(BUILD)/_frozen_mpy.c: $(BUILD)/genhdr/qstrdefs.generated.h $(FROZEN_SCRIPTS:.py=.mpy)
+	$(ECHO) "MPT $@"
+	$(Q)$(TOP)/tools/mpy-tool.py $(MPTFLAGS) -q $(BUILD)/genhdr/qstrdefs.preprocessed.h $(FROZEN_SCRIPTS:.py=.mpy) > $@
 
 $(BUILD)/firmware.elf: $(OBJ)
-	$(ECHO) "LINK $@"
+	$(ECHO) "LD $@"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 	$(Q)$(SIZE) $@
 
@@ -75,6 +93,10 @@ $(BUILD)/firmware.dfu: $(BUILD)/firmware.bin
 deploy: $(BUILD)/firmware.dfu
 	$(ECHO) "Writing $< to the board"
 	$(Q)$(PYTHON) $(PYDFU) -u $<
+
+spotless:
+	$(MAKE) clean
+	$(RM) -f $(FROZEN_SCRIPTS:.py=.mpy)
 
 # Run emulation build on a POSIX system with suitable terminal settings
 run:
