@@ -131,8 +131,8 @@ STATIC int parse_compile_execute(const void *source, mp_parse_input_kind_t input
         {
             size_t n_pool, n_qstr, n_str_data_bytes, n_total_bytes;
             qstr_pool_info(&n_pool, &n_qstr, &n_str_data_bytes, &n_total_bytes);
-            printf("qstr:\n  n_pool=" UINT_FMT "\n  n_qstr=" UINT_FMT "\n  "
-                   "n_str_data_bytes=" UINT_FMT "\n  n_total_bytes=" UINT_FMT "\n",
+            printf("qstr:\n  n_pool=%u\n  n_qstr=%u\n  "
+                   "n_str_data_bytes=%u\n  n_total_bytes=%u\n",
                    (unsigned)n_pool, (unsigned)n_qstr, (unsigned)n_str_data_bytes, (unsigned)n_total_bytes);
         }
 
