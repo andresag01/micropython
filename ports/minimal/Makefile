@@ -1,6 +1,6 @@
-include ../../py/mkenv.mk
-
 CROSS = 0
+
+include ../../py/mkenv.mk
 
 FROZEN_DIR = frozen
 
