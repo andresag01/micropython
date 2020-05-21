@@ -377,6 +377,191 @@ int mp_print_float(const mp_print_t *print, mp_float_t f, char fmt, int flags, c
 }
 #endif
 
+#if __cpu0__
+__attribute__((naked)) unsigned long int getPtrOffset(size_t ptr) {
+	__asm volatile (
+	"ldao		r0, r0		\n"
+	"ret					\n"
+	);
+}
+#else
+#define getPtrOffset(p)		((unsigned long int)p)
+#endif
+
+int mp_printf_one(const mp_print_t *print, const char *fmt, size_t inarg) {
+	return mp_vprintf_alt(print, fmt, 0, inarg);
+}
+
+int mp_vprintf_alt(const mp_print_t *print, const char *fmt, int inprec, size_t inarg) {
+    int chrs = 0;
+    for (;;) {
+        {
+            const char *f = fmt;
+            while (*f != '\0' && *f != '%') {
+                ++f; // XXX UTF8 advance char
+            }
+            if (f > fmt) {
+                print->print_strn(print->data, fmt, f - fmt);
+                chrs += f - fmt;
+                fmt = f;
+            }
+        }
+
+        if (*fmt == '\0') {
+            break;
+        }
+
+        // move past % character
+        ++fmt;
+
+        // parse flags, if they exist
+        int flags = 0;
+        char fill = ' ';
+        while (*fmt != '\0') {
+            if (*fmt == '-') flags |= PF_FLAG_LEFT_ADJUST;
+            else if (*fmt == '+') flags |= PF_FLAG_SHOW_SIGN;
+            else if (*fmt == ' ') flags |= PF_FLAG_SPACE_SIGN;
+            else if (*fmt == '!') flags |= PF_FLAG_NO_TRAILZ;
+            else if (*fmt == '0') {
+                flags |= PF_FLAG_PAD_AFTER_SIGN;
+                fill = '0';
+            } else break;
+            ++fmt;
+        }
+
+        // parse width, if it exists
+        int width = 0;
+        for (; '0' <= *fmt && *fmt <= '9'; ++fmt) {
+            width = width * 10 + *fmt - '0';
+        }
+
+        // parse precision, if it exists
+        int prec = -1;
+        if (*fmt == '.') {
+            ++fmt;
+            if (*fmt == '*') {
+                ++fmt;
+                prec = inprec;
+            } else {
+                prec = 0;
+                for (; '0' <= *fmt && *fmt <= '9'; ++fmt) {
+                    prec = prec * 10 + *fmt - '0';
+                }
+            }
+            if (prec < 0) {
+                prec = 0;
+            }
+        }
+
+        // parse long specifiers (only for LP64 model where they make a difference)
+        #ifndef __LP64__
+        const
+        #endif
+        bool long_arg = false;
+        if (*fmt == 'l') {
+            ++fmt;
+            #ifdef __LP64__
+            long_arg = true;
+            #endif
+        }
+
+        if (*fmt == '\0') {
+            break;
+        }
+
+        switch (*fmt) {
+            case 'b':
+                if ((int)inarg) {
+                    chrs += mp_print_strn(print, "true", 4, flags, fill, width);
+                } else {
+                    chrs += mp_print_strn(print, "false", 5, flags, fill, width);
+                }
+                break;
+            case 'c':
+            {
+                char str = (int)inarg;
+                chrs += mp_print_strn(print, &str, 1, flags, fill, width);
+                break;
+            }
+            case 'q':
+            {
+                qstr qst = (qstr)inarg;
+                size_t len;
+                const char *str = (const char*)qstr_data(qst, &len);
+                if (prec < 0) {
+                    prec = len;
+                }
+                chrs += mp_print_strn(print, str, prec, flags, fill, width);
+                break;
+            }
+            case 's':
+            {
+                const char *str = (const char*)inarg;
+                #ifndef NDEBUG
+                // With debugging enabled, catch printing of null string pointers
+                if (prec != 0 && str == NULL) {
+                    chrs += mp_print_strn(print, "(null)", 6, flags, fill, width);
+                    break;
+                }
+                #endif
+                if (prec < 0) {
+                    prec = strlen(str);
+                }
+                chrs += mp_print_strn(print, str, prec, flags, fill, width);
+                break;
+            }
+            case 'u':
+                chrs += mp_print_int(print, (unsigned int)inarg, 0, 10, 'a', flags, fill, width);
+                break;
+            case 'd':
+                chrs += mp_print_int(print, (int)inarg, 1, 10, 'a', flags, fill, width);
+                break;
+            case 'x':
+            case 'X': {
+                char fmt_c = *fmt - 'X' + 'A';
+                mp_uint_t val;
+                if (long_arg) {
+                    val = (unsigned long int)inarg;
+                } else {
+                    val = (unsigned int)inarg;
+                }
+                chrs += mp_print_int(print, val, 0, 16, fmt_c, flags, fill, width);
+                break;
+            }
+            case 'p':
+            case 'P': // don't bother to handle upcase for 'P'
+                // Use unsigned long int to work on both ILP32 and LP64 systems
+                chrs += mp_print_int(print, getPtrOffset(inarg), 0, 16, 'a', flags, fill, width);
+                break;
+
+            // Because 'l' is eaten above, another 'l' means %ll.  We need to support
+            // this length specifier for OBJ_REPR_D (64-bit NaN boxing).
+            // TODO Either enable this unconditionally, or provide a specific config var.
+            #if (MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_D) || defined(_WIN64)
+            case 'l': {
+                abort();
+                //unsigned long long int arg_value = va_arg(args, unsigned long long int);
+                //++fmt;
+                //if (*fmt == 'u' || *fmt == 'd') {
+                //    chrs += mp_print_int(print, arg_value, *fmt == 'd', 10, 'a', flags, fill, width);
+                //    break;
+                //}
+                assert(!"unsupported fmt char");
+            }
+            #endif
+            default:
+                // if it's not %% then it's an unsupported format character
+                assert(*fmt == '%' || !"unsupported fmt char");
+                print->print_strn(print->data, fmt, 1);
+                chrs += 1;
+                break;
+        }
+        ++fmt;
+    }
+    return chrs;
+}
+
+#if !defined(__cpu0__)
 int mp_printf(const mp_print_t *print, const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
@@ -568,3 +753,4 @@ int mp_vprintf(const mp_print_t *print, const char *fmt, va_list args) {
     }
     return chrs;
 }
+#endif /* !__cpu0__ */

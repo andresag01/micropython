@@ -266,7 +266,8 @@ STATIC void instance_print(const mp_print_t *print, mp_obj_t self_in, mp_print_k
     }
 
     // TODO: CPython prints fully-qualified type name
-    mp_printf(print, "<%s object at %p>", mp_obj_get_type_str(self_in), self);
+    mp_printf_one(print, "<%s", (size_t)mp_obj_get_type_str(self_in));
+	mp_printf_one(print, " object at %p>", (size_t)self);
 }
 
 mp_obj_t mp_obj_instance_make_new(const mp_obj_type_t *self, size_t n_args, size_t n_kw, const mp_obj_t *args) {
@@ -345,8 +346,13 @@ mp_obj_t mp_obj_instance_make_new(const mp_obj_type_t *self, size_t n_args, size
             if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                 mp_raise_TypeError("__init__() should return None");
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "__init__() should return None, not '%s'", (size_t)mp_obj_get_type_str(init_ret)));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "__init__() should return None, not '%s'", mp_obj_get_type_str(init_ret)));
+#endif
             }
         }
 
@@ -842,8 +848,13 @@ mp_obj_t mp_obj_instance_call(mp_obj_t self_in, size_t n_args, size_t n_kw, cons
         if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
             mp_raise_TypeError("object not callable");
         } else {
+#if defined(__cpu0__)
+            nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                "'%s' object is not callable", (size_t)mp_obj_get_type_str(self_in)));
+#else
             nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                 "'%s' object is not callable", mp_obj_get_type_str(self_in)));
+#endif
         }
     }
     mp_obj_instance_t *self = MP_OBJ_TO_PTR(self_in);
@@ -903,7 +914,7 @@ STATIC mp_int_t instance_get_buffer(mp_obj_t self_in, mp_buffer_info_t *bufinfo,
 STATIC void type_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     (void)kind;
     mp_obj_type_t *self = MP_OBJ_TO_PTR(self_in);
-    mp_printf(print, "<class '%q'>", self->name);
+    mp_printf_one(print, "<class '%q'>", self->name);
 }
 
 STATIC mp_obj_t type_make_new(const mp_obj_type_t *type_in, size_t n_args, size_t n_kw, const mp_obj_t *args) {
@@ -935,8 +946,13 @@ STATIC mp_obj_t type_call(mp_obj_t self_in, size_t n_args, size_t n_kw, const mp
         if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
             mp_raise_TypeError("cannot create instance");
         } else {
+#if defined(__cpu0__)
+            nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                "cannot create '%q' instances", (size_t)self->name));
+#else
             nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                 "cannot create '%q' instances", self->name));
+#endif
         }
     }
 
@@ -1023,8 +1039,13 @@ mp_obj_t mp_obj_new_type(qstr name, mp_obj_t bases_tuple, mp_obj_t locals_dict) 
             if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                 mp_raise_TypeError("type is not an acceptable base type");
             } else {
+#if defined(__cpu0__)
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "type '%q' is not an acceptable base type", t->name));
+#else
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "type '%q' is not an acceptable base type", t->name));
+#endif
             }
         }
     }

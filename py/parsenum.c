@@ -154,7 +154,7 @@ value_error:
         vstr_t vstr;
         mp_print_t print;
         vstr_init_print(&vstr, 50, &print);
-        mp_printf(&print, "invalid syntax for integer with base %d: ", base);
+        mp_printf_one(&print, "invalid syntax for integer with base %d: ", base);
         mp_str_print_quoted(&print, str_val_start, top - str_val_start, true);
         mp_obj_t exc = mp_obj_new_exception_arg1(&mp_type_ValueError,
             mp_obj_new_str_from_vstr(&mp_type_str, &vstr));

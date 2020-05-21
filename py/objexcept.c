@@ -115,7 +115,8 @@ void mp_obj_exception_print(const mp_print_t *print, mp_obj_t o_in, mp_print_kin
             if (o->base.type == &mp_type_OSError && MP_OBJ_IS_SMALL_INT(o->args->items[0])) {
                 qstr qst = mp_errno_to_str(o->args->items[0]);
                 if (qst != MP_QSTR_NULL) {
-                    mp_printf(print, "[Errno " INT_FMT "] %q", MP_OBJ_SMALL_INT_VALUE(o->args->items[0]), qst);
+                    mp_printf_one(print, "[Errno " INT_FMT, MP_OBJ_SMALL_INT_VALUE(o->args->items[0]));
+					mp_printf_one(print, "] %q", qst);
                     return;
                 }
             }
@@ -313,7 +314,7 @@ mp_obj_t mp_obj_new_exception_args(const mp_obj_type_t *exc_type, size_t n_args,
 }
 
 mp_obj_t mp_obj_new_exception_msg(const mp_obj_type_t *exc_type, const char *msg) {
-    return mp_obj_new_exception_msg_varg(exc_type, msg);
+    return mp_obj_new_exception_msg_varg(exc_type, msg, 0);
 }
 
 // The following struct and function implement a simple printer that conservatively
@@ -349,7 +350,11 @@ STATIC void exc_add_strn(void *data, const char *str, size_t len) {
     pr->len += len;
 }
 
+#if defined(__cpu0__)
+mp_obj_t mp_obj_new_exception_msg_varg(const mp_obj_type_t *exc_type, const char *fmt, size_t inarg) {
+#else
 mp_obj_t mp_obj_new_exception_msg_varg(const mp_obj_type_t *exc_type, const char *fmt, ...) {
+#endif
     assert(fmt != NULL);
 
     // Check that the given type is an exception type
@@ -391,10 +396,14 @@ mp_obj_t mp_obj_new_exception_msg_varg(const mp_obj_type_t *exc_type, const char
         // We have some memory to format the string
         struct _exc_printer_t exc_pr = {!used_emg_buf, o_str_alloc, 0, o_str_buf};
         mp_print_t print = {&exc_pr, exc_add_strn};
+#if defined(__cpu0__)
+		mp_printf_one(&print, fmt, inarg);
+#else
         va_list ap;
         va_start(ap, fmt);
         mp_vprintf(&print, fmt, ap);
         va_end(ap);
+#endif
         exc_pr.buf[exc_pr.len] = '\0';
         o_str->len = exc_pr.len;
         o_str->data = exc_pr.buf;

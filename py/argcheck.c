@@ -45,9 +45,15 @@ void mp_arg_check_num(size_t n_args, size_t n_kw, size_t n_args_min, size_t n_ar
             if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                 mp_arg_error_terse_mismatch();
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "function takes %d positional arguments but <d> were given",
+                    n_args_min));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "function takes %d positional arguments but %d were given",
                     n_args_min, n_args));
+#endif
             }
         }
     } else {
@@ -63,9 +69,15 @@ void mp_arg_check_num(size_t n_args, size_t n_kw, size_t n_args_min, size_t n_ar
             if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                 mp_arg_error_terse_mismatch();
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "function expected at most %d arguments, got <d>",
+                    n_args_max));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "function expected at most %d arguments, got %d",
                     n_args_max, n_args));
+#endif
             }
         }
     }

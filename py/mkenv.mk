@@ -44,6 +44,21 @@ MKDIR = mkdir
 SED = sed
 PYTHON = python
 
+ifeq ($(CROSS), 1)
+
+LLVM_BASE_DIR = /home/andresag/Repos/llvm-project-beyondrisc/build/bin
+CLANG         = $(LLVM_BASE_DIR)/clang
+LLC           = $(LLVM_BASE_DIR)/llc
+DISASSEMBLER  = $(LLVM_BASE_DIR)/llvm-dis
+CPP 		  = $(CLANG) -E
+
+BRISC_ASM_DIR = /home/andresag/Repos/brisc-assembler
+ASM           = $(BRISC_ASM_DIR)/assembler.py
+
+INSTR_DB = /home/andresag/Repos/IHGC-Specifications/isa/instructions
+
+else
+
 AS = $(CROSS_COMPILE)as
 CC = $(CROSS_COMPILE)gcc
 CXX = $(CROSS_COMPILE)g++
@@ -56,6 +71,8 @@ ifeq ($(MICROPY_FORCE_32BIT),1)
 CC += -m32
 CXX += -m32
 LD += -m32
+endif
+
 endif
 
 MAKE_FROZEN = $(PYTHON) $(TOP)/tools/make-frozen.py

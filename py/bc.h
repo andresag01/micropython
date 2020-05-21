@@ -102,10 +102,17 @@ const byte *mp_bytecode_print_str(const byte *ip);
 #define mp_bytecode_print_inst(code, const_table) mp_bytecode_print2(code, 1, const_table)
 
 // Helper macros to access pointer with least significant bits holding flags
+#if defined(__cpu0__)
+#define MP_TAGPTR_PTR(x)         (clearPointerByteIndex(x))
+#define MP_TAGPTR_TAG0(x)        (getPointerByteIndex(x) & 1)
+#define MP_TAGPTR_TAG1(x)        (getPointerByteIndex(x) & 2)
+#define MP_TAGPTR_MAKE(ptr, tag) (orPointerOffset(ptr, tag))
+#else
 #define MP_TAGPTR_PTR(x) ((void*)((uintptr_t)(x) & ~((uintptr_t)3)))
 #define MP_TAGPTR_TAG0(x) ((uintptr_t)(x) & 1)
 #define MP_TAGPTR_TAG1(x) ((uintptr_t)(x) & 2)
 #define MP_TAGPTR_MAKE(ptr, tag) ((void*)((uintptr_t)(ptr) | (tag)))
+#endif
 
 #if MICROPY_PERSISTENT_CODE_LOAD || MICROPY_PERSISTENT_CODE_SAVE
 

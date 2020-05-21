@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "py/parsenum.h"
 #include "py/smallint.h"

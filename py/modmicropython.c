@@ -69,14 +69,15 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(mp_micropython_mem_peak_obj, mp_micropython_mem
 mp_obj_t mp_micropython_mem_info(size_t n_args, const mp_obj_t *args) {
     (void)args;
 #if MICROPY_MEM_STATS
-    mp_printf(&mp_plat_print, "mem: total=" UINT_FMT ", current=" UINT_FMT ", peak=" UINT_FMT "\n",
-        (mp_uint_t)m_get_total_bytes_allocated(), (mp_uint_t)m_get_current_bytes_allocated(), (mp_uint_t)m_get_peak_bytes_allocated());
+    mp_printf_one(&mp_plat_print, "mem: total=" UINT_FMT, (mp_uint_t)m_get_total_bytes_allocated());
+	mp_printf_one(&mp_plat_print, ", current=" UINT_FMT, (mp_uint_t)m_get_current_bytes_allocated());
+	mp_printf_one(&mp_plat_print, ", peak=" UINT_FMT "\n", (mp_uint_t)m_get_peak_bytes_allocated());
 #endif
 #if MICROPY_STACK_CHECK
-    mp_printf(&mp_plat_print, "stack: " UINT_FMT " out of " UINT_FMT "\n",
-        mp_stack_usage(), (mp_uint_t)MP_STATE_THREAD(stack_limit));
+    mp_printf_one(&mp_plat_print, "stack: " UINT_FMT, mp_stack_usage());
+	mp_printf_one(&mp_plat_print, " out of " UINT_FMT "\n", (mp_uint_t)MP_STATE_THREAD(stack_limit));
 #else
-    mp_printf(&mp_plat_print, "stack: " UINT_FMT "\n", mp_stack_usage());
+    mp_printf_one(&mp_plat_print, "stack: " UINT_FMT "\n", mp_stack_usage());
 #endif
 #if MICROPY_ENABLE_GC
     gc_dump_info();
@@ -95,8 +96,10 @@ STATIC mp_obj_t mp_micropython_qstr_info(size_t n_args, const mp_obj_t *args) {
     (void)args;
     size_t n_pool, n_qstr, n_str_data_bytes, n_total_bytes;
     qstr_pool_info(&n_pool, &n_qstr, &n_str_data_bytes, &n_total_bytes);
-    mp_printf(&mp_plat_print, "qstr pool: n_pool=%u, n_qstr=%u, n_str_data_bytes=%u, n_total_bytes=%u\n",
-        n_pool, n_qstr, n_str_data_bytes, n_total_bytes);
+    mp_printf_one(&mp_plat_print, "qstr pool: n_pool=%u, ", n_pool);
+	mp_printf_one(&mp_plat_print, "n_qstr=%u, ", n_qstr);
+	mp_printf_one(&mp_plat_print, "n_str_data_bytes=%u, ", n_str_data_bytes);
+	mp_printf_one(&mp_plat_print, "n_total_bytes=%u\n", n_total_bytes);
     if (n_args == 1) {
         // arg given means dump qstr data
         qstr_dump_data();

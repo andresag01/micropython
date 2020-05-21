@@ -81,11 +81,12 @@ typedef struct _mp_obj_range_t {
 STATIC void range_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     (void)kind;
     mp_obj_range_t *self = MP_OBJ_TO_PTR(self_in);
-    mp_printf(print, "range(" INT_FMT ", " INT_FMT "", self->start, self->stop);
+    mp_printf_one(print, "range(" INT_FMT, self->start);
+	mp_printf_one(print, ", " INT_FMT "", self->stop);
     if (self->step == 1) {
         mp_print_str(print, ")");
     } else {
-        mp_printf(print, ", " INT_FMT ")", self->step);
+        mp_printf_one(print, ", " INT_FMT ")", self->step);
     }
 }
 

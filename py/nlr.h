@@ -58,6 +58,9 @@
 #elif defined(__xtensa__)
     #define MICROPY_NLR_XTENSA (1)
     #define MICROPY_NLR_NUM_REGS (10)
+#elif defined(__cpu0__)
+	#define MICROPY_NLR_BRISC (1)
+	#define MICROPY_NLR_NUM_REGS (9)
 #else
     #define MICROPY_NLR_SETJMP (1)
     //#warning "No native NLR support for this arch, using setjmp implementation"

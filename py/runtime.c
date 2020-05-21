@@ -269,9 +269,15 @@ mp_obj_t mp_unary_op(mp_unary_op_t op, mp_obj_t arg) {
         if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
             mp_raise_TypeError("unsupported type for operator");
         } else {
+#if defined(__cpu0__)
+            nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                "unsupported type for %q: '<str>'",
+                mp_unary_op_method_name[op]));
+#else
             nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                 "unsupported type for %q: '%s'",
                 mp_unary_op_method_name[op], mp_obj_get_type_str(arg)));
+#endif
         }
     }
 }
@@ -576,9 +582,15 @@ unsupported_op:
     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
         mp_raise_TypeError("unsupported type for operator");
     } else {
+#if defined(__cpu0__)
+        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+            "unsupported types for %q: '<str>', '<str>'",
+            mp_binary_op_method_name[op]));
+#else
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
             "unsupported types for %q: '%s', '%s'",
             mp_binary_op_method_name[op], mp_obj_get_type_str(lhs), mp_obj_get_type_str(rhs)));
+#endif
     }
 
 zero_division:
@@ -618,8 +630,13 @@ mp_obj_t mp_call_function_n_kw(mp_obj_t fun_in, size_t n_args, size_t n_kw, cons
     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
         mp_raise_TypeError("object not callable");
     } else {
+#if defined(__cpu0__)
+        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+            "'%s' object is not callable", (size_t)mp_obj_get_type_str(fun_in)));
+#else
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
             "'%s' object is not callable", mp_obj_get_type_str(fun_in)));
+#endif
     }
 }
 
@@ -950,8 +967,13 @@ STATIC mp_obj_t checked_fun_call(mp_obj_t self_in, size_t n_args, size_t n_kw, c
             if (MICROPY_ERROR_REPORTING != MICROPY_ERROR_REPORTING_DETAILED) {
                 mp_raise_TypeError("argument has wrong type");
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "argument should be a '%q' not a '<q>'", self->type->name));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "argument should be a '%q' not a '%q'", self->type->name, arg0_type->name));
+#endif
             }
         }
     }
@@ -1074,13 +1096,25 @@ void mp_load_method(mp_obj_t base, qstr attr, mp_obj_t *dest) {
         } else {
             // following CPython, we give a more detailed error message for type objects
             if (MP_OBJ_IS_TYPE(base, &mp_type_type)) {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_AttributeError,
+                    "type object '%q' has no attribute '<q>'",
+                    ((mp_obj_type_t*)MP_OBJ_TO_PTR(base))->name));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_AttributeError,
                     "type object '%q' has no attribute '%q'",
                     ((mp_obj_type_t*)MP_OBJ_TO_PTR(base))->name, attr));
+#endif
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_AttributeError,
+                    "'%s' object has no attribute '<q>'",
+                    (size_t)mp_obj_get_type_str(base)));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_AttributeError,
                     "'%s' object has no attribute '%q'",
                     mp_obj_get_type_str(base), attr));
+#endif
             }
         }
     }
@@ -1116,9 +1150,15 @@ void mp_store_attr(mp_obj_t base, qstr attr, mp_obj_t value) {
     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
         mp_raise_msg(&mp_type_AttributeError, "no such attribute");
     } else {
+#if defined(__cpu0__)
+        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_AttributeError,
+            "'%s' object has no attribute '<q>'",
+            (size_t)mp_obj_get_type_str(base)));
+#else
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_AttributeError,
             "'%s' object has no attribute '%q'",
             mp_obj_get_type_str(base), attr));
+#endif
     }
 }
 
@@ -1157,8 +1197,13 @@ mp_obj_t mp_getiter(mp_obj_t o_in, mp_obj_iter_buf_t *iter_buf) {
     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
         mp_raise_TypeError("object not iterable");
     } else {
+#if defined(__cpu0__)
+        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+            "'%s' object is not iterable", (size_t)mp_obj_get_type_str(o_in)));
+#else
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
             "'%s' object is not iterable", mp_obj_get_type_str(o_in)));
+#endif
     }
 }
 
@@ -1179,8 +1224,13 @@ mp_obj_t mp_iternext_allow_raise(mp_obj_t o_in) {
             if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                 mp_raise_TypeError("object not an iterator");
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "'%s' object is not an iterator", (size_t)mp_obj_get_type_str(o_in)));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "'%s' object is not an iterator", mp_obj_get_type_str(o_in)));
+#endif
             }
         }
     }
@@ -1215,8 +1265,13 @@ mp_obj_t mp_iternext(mp_obj_t o_in) {
             if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                 mp_raise_TypeError("object not an iterator");
             } else {
+#if defined(__cpu0__)
+                nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+                    "'%s' object is not an iterator", (size_t)mp_obj_get_type_str(o_in)));
+#else
                 nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
                     "'%s' object is not an iterator", mp_obj_get_type_str(o_in)));
+#endif
             }
         }
     }

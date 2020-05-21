@@ -59,7 +59,7 @@ STATIC void dict_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_
         kind = PRINT_REPR;
     }
     if (MICROPY_PY_COLLECTIONS_ORDEREDDICT && self->base.type != &mp_type_dict) {
-        mp_printf(print, "%q(", self->base.type->name);
+        mp_printf_one(print, "%q(", self->base.type->name);
     }
     mp_print_str(print, "{");
     size_t cur = 0;

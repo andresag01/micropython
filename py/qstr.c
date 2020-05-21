@@ -288,7 +288,7 @@ void qstr_dump_data(void) {
     QSTR_ENTER();
     for (qstr_pool_t *pool = MP_STATE_VM(last_pool); pool != NULL && pool != &CONST_POOL; pool = pool->prev) {
         for (const byte **q = pool->qstrs, **q_top = pool->qstrs + pool->len; q < q_top; q++) {
-            mp_printf(&mp_plat_print, "Q(%s)\n", Q_GET_DATA(*q));
+            mp_printf_one(&mp_plat_print, "Q(%s)\n", Q_GET_DATA(*q));
         }
     }
     QSTR_EXIT();

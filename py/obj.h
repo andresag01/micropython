@@ -26,6 +26,8 @@
 #ifndef MICROPY_INCLUDED_PY_OBJ_H
 #define MICROPY_INCLUDED_PY_OBJ_H
 
+#include <stdlib.h>
+
 #include "py/mpconfig.h"
 #include "py/misc.h"
 #include "py/qstr.h"
@@ -81,13 +83,21 @@ typedef struct _mp_obj_base_t mp_obj_base_t;
 
 #if MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_A
 
+#if defined(__cpu0__)
+bool MP_OBJ_IS_SMALL_INT(mp_const_obj_t o);
+#else
 static inline bool MP_OBJ_IS_SMALL_INT(mp_const_obj_t o)
     { return ((((mp_int_t)(o)) & 1) != 0); }
+#endif
 #define MP_OBJ_SMALL_INT_VALUE(o) (((mp_int_t)(o)) >> 1)
 #define MP_OBJ_NEW_SMALL_INT(small_int) ((mp_obj_t)((((mp_uint_t)(small_int)) << 1) | 1))
 
+#if defined(__cpu0__)
+bool MP_OBJ_IS_QSTR(mp_const_obj_t o);
+#else
 static inline bool MP_OBJ_IS_QSTR(mp_const_obj_t o)
     { return ((((mp_int_t)(o)) & 3) == 2); }
+#endif
 #define MP_OBJ_QSTR_VALUE(o) (((mp_uint_t)(o)) >> 2)
 #define MP_OBJ_NEW_QSTR(qst) ((mp_obj_t)((((mp_uint_t)(qst)) << 2) | 2))
 
@@ -102,8 +112,12 @@ mp_float_t mp_obj_float_get(mp_obj_t self_in);
 mp_obj_t mp_obj_new_float(mp_float_t value);
 #endif
 
+#if defined(__cpu0__)
+bool MP_OBJ_IS_OBJ(mp_const_obj_t o);
+#else
 static inline bool MP_OBJ_IS_OBJ(mp_const_obj_t o)
     { return ((((mp_int_t)(o)) & 3) == 0); }
+#endif
 
 #elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_B
 
@@ -642,7 +656,11 @@ mp_obj_t mp_obj_new_exception(const mp_obj_type_t *exc_type);
 mp_obj_t mp_obj_new_exception_arg1(const mp_obj_type_t *exc_type, mp_obj_t arg);
 mp_obj_t mp_obj_new_exception_args(const mp_obj_type_t *exc_type, size_t n_args, const mp_obj_t *args);
 mp_obj_t mp_obj_new_exception_msg(const mp_obj_type_t *exc_type, const char *msg);
+#if defined(__cpu0__)
+mp_obj_t mp_obj_new_exception_msg_varg(const mp_obj_type_t *exc_type, const char *fmt, size_t inarg); // counts args by number of % symbols in fmt, excluding %%; can only handle void* sizes (ie no float/double!)
+#else
 mp_obj_t mp_obj_new_exception_msg_varg(const mp_obj_type_t *exc_type, const char *fmt, ...); // counts args by number of % symbols in fmt, excluding %%; can only handle void* sizes (ie no float/double!)
+#endif
 mp_obj_t mp_obj_new_fun_bc(mp_obj_t def_args, mp_obj_t def_kw_args, const byte *code, const mp_uint_t *const_table);
 mp_obj_t mp_obj_new_fun_native(mp_obj_t def_args_in, mp_obj_t def_kw_args, const void *fun_data, const mp_uint_t *const_table);
 mp_obj_t mp_obj_new_fun_viper(size_t n_args, void *fun_data, mp_uint_t type_sig);

@@ -57,7 +57,7 @@ typedef struct _mp_obj_match_t {
 STATIC void match_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     (void)kind;
     mp_obj_match_t *self = MP_OBJ_TO_PTR(self_in);
-    mp_printf(print, "<match num=%d>", self->num_matches);
+    mp_printf_one(print, "<match num=%d>", self->num_matches);
 }
 
 STATIC mp_obj_t match_group(mp_obj_t self_in, mp_obj_t no_in) {
@@ -93,7 +93,7 @@ STATIC const mp_obj_type_t match_type = {
 STATIC void re_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
     (void)kind;
     mp_obj_re_t *self = MP_OBJ_TO_PTR(self_in);
-    mp_printf(print, "<re %p>", self);
+    mp_printf_one(print, "<re %p>", (size_t)self);
 }
 
 STATIC mp_obj_t ure_exec(bool is_anchored, uint n_args, const mp_obj_t *args) {

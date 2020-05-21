@@ -22,13 +22,35 @@ endif
 
 vpath %.S . $(TOP)
 $(BUILD)/%.o: %.S
+	$(error Unexpected rule matched)
 	$(ECHO) "CC $<"
 	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
 
 vpath %.s . $(TOP)
 $(BUILD)/%.o: %.s
+	$(error Unexpected rule matched)
 	$(ECHO) "AS $<"
 	$(Q)$(AS) -o $@ $<
+
+ifeq ($(CROSS), 1)
+
+define compile_c
+$(ECHO) "CC $<"
+$(Q)$(CLANG) $(CFLAGS) -MD -c -o $(@:.o=.bc) $<
+$(ECHO) "DAS $<"
+$(Q)$(DISASSEMBLER) $(@:.o=.bc)
+$(ECHO) "LLC $<"
+$(Q)$(LLC) $(LFLAGS) -o $@ $(@:.o=.bc)
+@# The following fixes the dependency file.
+@# See http://make.paulandlesley.org/autodep.html for details.
+@# Regex adjusted from the above to play better with Windows paths, etc.
+@$(CP) $(@:.o=.d) $(@:.o=.P); \
+  $(SED) -e 's/#.*//' -e 's/^.*:  *//' -e 's/ *\\$$//' \
+      -e '/^$$/ d' -e 's/$$/ :/' < $(@:.o=.d) >> $(@:.o=.P); \
+  $(RM) -f $(@:.o=.d)
+endef
+
+else
 
 define compile_c
 $(ECHO) "CC $<"
@@ -42,6 +64,8 @@ $(Q)$(CC) $(CFLAGS) -c -MD -o $@ $<
   $(RM) -f $(@:.o=.d)
 endef
 
+endif
+
 vpath %.c . $(TOP)
 $(BUILD)/%.o: %.c
 	$(call compile_c)
@@ -52,6 +76,7 @@ QSTR_GEN_EXTRA_CFLAGS += -I$(BUILD)/tmp
 vpath %.c . $(TOP)
 
 $(BUILD)/%.pp: %.c
+	$(error Unexpected rule matched)
 	$(ECHO) "PreProcess $<"
 	$(Q)$(CC) $(CFLAGS) -E -Wp,-C,-dD,-dI -o $@ $<
 

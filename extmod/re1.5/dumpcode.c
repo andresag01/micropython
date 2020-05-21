@@ -3,63 +3,70 @@
 // license that can be found in the LICENSE file.
 
 #include "re1.5.h"
+#include "py/mpprint.h"
 
 void re1_5_dumpcode(ByteProg *prog)
 {
     int pc = 0;
     char *code = prog->insts;
     while (pc < prog->bytelen) {
-                printf("%2d: ", pc);
+                mp_printf_one(MP_PYTHON_PRINTER, "%2d: ", pc);
                 switch(code[pc++]) {
                 default:
                         assert(0);
 //                        re1_5_fatal("printprog");
                 case Split:
-                        printf("split %d (%d)\n", pc + (signed char)code[pc] + 1, (signed char)code[pc]);
+                        mp_printf_one(MP_PYTHON_PRINTER, "split %d ", pc + (signed char)code[pc] + 1);
+						mp_printf_one(MP_PYTHON_PRINTER, "(%d)\n", (signed char)code[pc]);
                         pc++;
                         break;
                 case RSplit:
-                        printf("rsplit %d (%d)\n", pc + (signed char)code[pc] + 1, (signed char)code[pc]);
+                        mp_printf_one(MP_PYTHON_PRINTER, "rsplit %d ", pc + (signed char)code[pc] + 1);
+						mp_printf_one(MP_PYTHON_PRINTER, "(%d)\n", (signed char)code[pc]);
                         pc++;
                         break;
                 case Jmp:
-                        printf("jmp %d (%d)\n", pc + (signed char)code[pc] + 1, (signed char)code[pc]);
+                        mp_printf_one(MP_PYTHON_PRINTER, "jmp %d ", pc + (signed char)code[pc] + 1);
+						mp_printf_one(MP_PYTHON_PRINTER, "(%d)\n", (signed char)code[pc]);
                         pc++;
                         break;
                 case Char:
-                        printf("char %c\n", code[pc++]);
+                        mp_printf_one(MP_PYTHON_PRINTER, "char %c\n", code[pc++]);
                         break;
                 case Any:
-                        printf("any\n");
+                        mp_printf_one(MP_PYTHON_PRINTER, "any\n", 0);
                         break;
                 case Class:
                 case ClassNot: {
                         int num = code[pc];
-                        printf("class%s %d", (code[pc - 1] == ClassNot ? "not" : ""), num);
+                        mp_printf_one(MP_PYTHON_PRINTER, "class%s ", (size_t)(code[pc - 1] == ClassNot ? "not" : ""));
+						mp_printf_one(MP_PYTHON_PRINTER, "%d", num);
                         pc++;
                         while (num--) {
-                            printf(" 0x%02x-0x%02x", code[pc], code[pc + 1]);
+                            mp_printf_one(MP_PYTHON_PRINTER, " 0x%02x-", code[pc]);
+							mp_printf_one(MP_PYTHON_PRINTER, "0x%02x", code[pc + 1]);
                             pc += 2;
                         }
-                        printf("\n");
+                        mp_printf_one(MP_PYTHON_PRINTER, "\n", 0);
                         break;
                 }
                 case NamedClass:
-                        printf("namedclass %c\n", code[pc++]);
+                        mp_printf_one(MP_PYTHON_PRINTER, "namedclass %c\n", code[pc++]);
                         break;
                 case Match:
-                        printf("match\n");
+                        mp_printf_one(MP_PYTHON_PRINTER, "match\n", 0);
                         break;
                 case Save:
-                        printf("save %d\n", (unsigned char)code[pc++]);
+                        mp_printf_one(MP_PYTHON_PRINTER, "save %d\n", (unsigned char)code[pc++]);
                         break;
                 case Bol:
-                        printf("assert bol\n");
+                        mp_printf_one(MP_PYTHON_PRINTER, "assert bol\n", 0);
                         break;
                 case Eol:
-                        printf("assert eol\n");
+                        mp_printf_one(MP_PYTHON_PRINTER, "assert eol\n", 0);
                         break;
                 }
     }
-    printf("Bytes: %d, insts: %d\n", prog->bytelen, prog->len);
+    mp_printf_one(MP_PYTHON_PRINTER, "Bytes: %d, ", prog->bytelen);
+	mp_printf_one(MP_PYTHON_PRINTER, "insts: %d\n", prog->len);
 }

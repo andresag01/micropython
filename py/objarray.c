@@ -73,7 +73,7 @@ STATIC void array_print(const mp_print_t *print, mp_obj_t o_in, mp_print_kind_t 
         mp_print_str(print, "bytearray(b");
         mp_str_print_quoted(print, o->items, o->len, true);
     } else {
-        mp_printf(print, "array('%c'", o->typecode);
+        mp_printf_one(print, "array('%c'", o->typecode);
         if (o->len > 0) {
             mp_print_str(print, ", [");
             for (size_t i = 0; i < o->len; i++) {

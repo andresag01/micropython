@@ -35,6 +35,7 @@
 #include "py/gc.h"
 #include "py/frozenmod.h"
 #include "py/mphal.h"
+#include "py/mpprint.h"
 #if MICROPY_HW_ENABLE_USB
 #include "irq.h"
 #include "usb.h"
@@ -126,14 +127,25 @@ STATIC int parse_compile_execute(const void *source, mp_parse_input_kind_t input
     // display debugging info if wanted
     if ((exec_flags & EXEC_FLAG_ALLOW_DEBUGGING) && repl_display_debugging_info) {
         mp_uint_t ticks = mp_hal_ticks_ms() - start; // TODO implement a function that does this properly
+#if defined(__cpu0__)
+        mp_printf_one(MP_PYTHON_PRINTER, "took " UINT_FMT " ms\n", ticks);
+#else
         printf("took " UINT_FMT " ms\n", ticks);
+#endif
         // qstr info
         {
             size_t n_pool, n_qstr, n_str_data_bytes, n_total_bytes;
             qstr_pool_info(&n_pool, &n_qstr, &n_str_data_bytes, &n_total_bytes);
+#if defined(__cpu0__)
+            mp_printf_one(MP_PYTHON_PRINTER, "qstr:\n  n_pool=%u\n  ", (unsigned)n_pool);
+			mp_printf_one(MP_PYTHON_PRINTER, "n_qstr=%u\n  ", (unsigned)n_qstr);
+            mp_printf_one(MP_PYTHON_PRINTER, "n_str_data_bytes=%u\n  ", (unsigned)n_str_data_bytes);
+			mp_printf_one(MP_PYTHON_PRINTER, "n_total_bytes=%u\n", (unsigned)n_total_bytes);
+#else
             printf("qstr:\n  n_pool=%u\n  n_qstr=%u\n  "
                    "n_str_data_bytes=%u\n  n_total_bytes=%u\n",
                    (unsigned)n_pool, (unsigned)n_qstr, (unsigned)n_str_data_bytes, (unsigned)n_total_bytes);
+#endif
         }
 
         #if MICROPY_ENABLE_GC
@@ -516,7 +528,11 @@ int pyexec_frozen_module(const char *name) {
         #endif
 
         default:
+#if defined(__cpu0__)
+            mp_printf_one(MP_PYTHON_PRINTER, "could not find module '%s'\n", (size_t)name);
+#else
             printf("could not find module '%s'\n", name);
+#endif
             return false;
     }
 }

@@ -232,6 +232,7 @@ void vstr_cut_out_bytes(vstr_t *vstr, size_t byte_pos, size_t bytes_to_cut) {
     }
 }
 
+#if !defined(__cpu0__)
 void vstr_printf(vstr_t *vstr, const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
@@ -243,3 +244,4 @@ void vstr_vprintf(vstr_t *vstr, const char *fmt, va_list ap) {
     mp_print_t print = {vstr, (mp_print_strn_t)vstr_add_strn};
     mp_vprintf(&print, fmt, ap);
 }
+#endif /* !__cpu0__ */

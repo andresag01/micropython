@@ -181,7 +181,9 @@ void vstr_ins_char(vstr_t *vstr, size_t char_pos, unichar chr);
 void vstr_cut_head_bytes(vstr_t *vstr, size_t bytes_to_cut);
 void vstr_cut_tail_bytes(vstr_t *vstr, size_t bytes_to_cut);
 void vstr_cut_out_bytes(vstr_t *vstr, size_t byte_pos, size_t bytes_to_cut);
+#if !defined(__cpu0__)
 void vstr_printf(vstr_t *vstr, const char *fmt, ...);
+#endif
 
 /** non-dynamic size-bounded variable buffer/string *************/
 
@@ -195,8 +197,10 @@ void vstr_printf(vstr_t *vstr, const char *fmt, ...);
 #define CHECKBUF_APPEND_0(buf) { *buf##_p = 0; }
 #define CHECKBUF_LEN(buf) (buf##_p - buf)
 
+#if !defined(__cpu0__)
 #ifdef va_start
 void vstr_vprintf(vstr_t *vstr, const char *fmt, va_list ap);
+#endif
 #endif
 
 // Debugging helpers

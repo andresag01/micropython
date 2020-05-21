@@ -248,7 +248,7 @@ size_t mp_repl_autocomplete(const char *str, size_t len, const mp_print_t *print
                             mp_print_str(print, d_str);
                             line_len += gap + d_len;
                         } else {
-                            mp_printf(print, "\n%s", d_str);
+                            mp_printf_one(print, "\n%s", (size_t)d_str);
                             line_len = d_len;
                         }
                     }

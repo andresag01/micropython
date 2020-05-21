@@ -66,9 +66,14 @@ int mp_print_strn(const mp_print_t *print, const char *str, size_t len, int flag
 int mp_print_float(const mp_print_t *print, mp_float_t f, char fmt, int flags, char fill, int width, int prec);
 #endif
 
+#if !defined(__cpu0__)
 int mp_printf(const mp_print_t *print, const char *fmt, ...);
 #ifdef va_start
 int mp_vprintf(const mp_print_t *print, const char *fmt, va_list args);
 #endif
+#endif /* !__cpu0__ */
+
+int mp_printf_one(const mp_print_t *print, const char *fmt, size_t inarg);
+int mp_vprintf_alt(const mp_print_t *print, const char *fmt, int inprec, size_t inarg);
 
 #endif // MICROPY_INCLUDED_PY_MPPRINT_H

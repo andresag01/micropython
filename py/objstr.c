@@ -57,17 +57,17 @@ void mp_str_print_quoted(const mp_print_t *print, const byte *str_data, size_t s
     if (has_single_quote && !has_double_quote) {
         quote_char = '"';
     }
-    mp_printf(print, "%c", quote_char);
+    mp_printf_one(print, "%c", quote_char);
     for (const byte *s = str_data, *top = str_data + str_len; s < top; s++) {
         if (*s == quote_char) {
-            mp_printf(print, "\\%c", quote_char);
+            mp_printf_one(print, "\\%c", quote_char);
         } else if (*s == '\\') {
             mp_print_str(print, "\\\\");
         } else if (*s >= 0x20 && *s != 0x7f && (!is_bytes || *s < 0x80)) {
             // In strings, anything which is not ascii control character
             // is printed as is, this includes characters in range 0x80-0xff
             // (which can be non-Latin letters, etc.)
-            mp_printf(print, "%c", *s);
+            mp_printf_one(print, "%c", *s);
         } else if (*s == '\n') {
             mp_print_str(print, "\\n");
         } else if (*s == '\r') {
@@ -75,10 +75,10 @@ void mp_str_print_quoted(const mp_print_t *print, const byte *str_data, size_t s
         } else if (*s == '\t') {
             mp_print_str(print, "\\t");
         } else {
-            mp_printf(print, "\\x%02x", *s);
+            mp_printf_one(print, "\\x%02x", *s);
         }
     }
-    mp_printf(print, "%c", quote_char);
+    mp_printf_one(print, "%c", quote_char);
 }
 
 #if MICROPY_PY_UJSON
@@ -88,10 +88,10 @@ void mp_str_print_json(const mp_print_t *print, const byte *str_data, size_t str
     mp_print_str(print, "\"");
     for (const byte *s = str_data, *top = str_data + str_len; s < top; s++) {
         if (*s == '"' || *s == '\\') {
-            mp_printf(print, "\\%c", *s);
+            mp_printf_one(print, "\\%c", *s);
         } else if (*s >= 32) {
             // this will handle normal and utf-8 encoded chars
-            mp_printf(print, "%c", *s);
+            mp_printf_one(print, "%c", *s);
         } else if (*s == '\n') {
             mp_print_str(print, "\\n");
         } else if (*s == '\r') {
@@ -100,7 +100,7 @@ void mp_str_print_json(const mp_print_t *print, const byte *str_data, size_t str
             mp_print_str(print, "\\t");
         } else {
             // this will handle control chars
-            mp_printf(print, "\\u%04x", *s);
+            mp_printf_one(print, "\\u%04x", *s);
         }
     }
     mp_print_str(print, "\"");
@@ -121,7 +121,7 @@ STATIC void str_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t
     bool is_bytes = true;
     #endif
     if (kind == PRINT_RAW || (!MICROPY_PY_BUILTINS_STR_UNICODE && kind == PRINT_STR && !is_bytes)) {
-        mp_printf(print, "%.*s", str_len, str_data);
+        mp_vprintf_alt(print, "%.*s", str_len, (size_t)str_data);
     } else {
         if (is_bytes) {
             mp_print_str(print, "b");
@@ -993,8 +993,13 @@ STATIC vstr_t mp_obj_str_format_helper(const char *str, const char *top, int *ar
                         mp_raise_ValueError(
                             "end of format while looking for conversion specifier");
                     } else {
+#if defined(__cpu0__)
                         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
                             "unknown conversion specifier %c", *str));
+#else
+                        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
+                            "unknown conversion specifier %c", *str));
+#endif
                     }
                 }
             }
@@ -1254,9 +1259,15 @@ STATIC vstr_t mp_obj_str_format_helper(const char *str, const char *top, int *ar
                     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                         terse_str_format_value_error();
                     } else {
+#if defined(__cpu0__)
+                        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
+                            "unknown format code '%c' for object of type '<s>'",
+                            type));
+#else
                         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
                             "unknown format code '%c' for object of type '%s'",
                             type, mp_obj_get_type_str(arg)));
+#endif
                     }
             }
         }
@@ -1326,9 +1337,15 @@ STATIC vstr_t mp_obj_str_format_helper(const char *str, const char *top, int *ar
                     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                         terse_str_format_value_error();
                     } else {
+#if defined(__cpu0__)
+                        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
+                            "unknown format code '%c' for object of type 'float'",
+                            type));
+#else
                         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
                             "unknown format code '%c' for object of type 'float'",
                             type, mp_obj_get_type_str(arg)));
+#endif
                     }
             }
         } else {
@@ -1362,9 +1379,15 @@ STATIC vstr_t mp_obj_str_format_helper(const char *str, const char *top, int *ar
                     if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                         terse_str_format_value_error();
                     } else {
+#if defined(__cpu0__)
+                        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
+                            "unknown format code '%c' for object of type 'str'",
+                            type));
+#else
                         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
                             "unknown format code '%c' for object of type 'str'",
                             type, mp_obj_get_type_str(arg)));
+#endif
                     }
             }
         }
@@ -1565,9 +1588,15 @@ not_enough_args:
                 if (MICROPY_ERROR_REPORTING == MICROPY_ERROR_REPORTING_TERSE) {
                     terse_str_format_value_error();
                 } else {
+#if defined(__cpu0__)
+                    nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
+                        "unsupported format character '%c' (0x<x>) at index <d>",
+                        *str));
+#else
                     nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError,
                         "unsupported format character '%c' (0x%x) at index %d",
                         *str, *str, str - start_str));
+#endif
                 }
         }
     }
@@ -2101,9 +2130,14 @@ STATIC NORETURN void bad_implicit_conversion(mp_obj_t self_in) {
         mp_raise_TypeError("can't convert to str implicitly");
     } else {
         const qstr src_name = mp_obj_get_type(self_in)->name;
+#if defined(__cpu0__)
+        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
+            "can't convert '%q' object to <q> implicitly", src_name));
+#else
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_TypeError,
             "can't convert '%q' object to %q implicitly",
             src_name, src_name == MP_QSTR_str ? MP_QSTR_bytes : MP_QSTR_str));
+#endif
     }
 }
 
