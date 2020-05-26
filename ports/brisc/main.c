@@ -31,29 +31,21 @@
 //#define SCRIPT_MODULE_PATH "frozen/bm_pyflate.py"
 //#define SCRIPT_MODULE_PATH "frozen/bm_regex_effbot.py"
 
-#define SCRIPTS_COUNT			2
+#define SCRIPTS_COUNT		    11
 #define MAX_SCRIPT_NAME_LENGTH	30
 static const char scripts[SCRIPTS_COUNT][30] = {
 	  "frozen/frozentest.py"
+	, "frozen/bm_unpack_sequence.py"
+	, "frozen/bm_deltablue.py"
+	, "frozen/bm_fannkuch.py"
+	, "frozen/bm_hexion.py"
+	, "frozen/bm_json_dumps.py"
 	, "frozen/bm_json_loads.py"
-	, //"frozen/bm_nqueens.py"
+	, "frozen/bm_meteor_contest.py"
+	, "frozen/bm_nqueens.py"
+	, "frozen/bm_pyflate.py"
+	, "frozen/bm_regex_effbot.py"
 };
-
-//#define SCRIPTS_COUNT			11
-//#define MAX_SCRIPT_NAME_LENGTH	30
-//static const char scripts[SCRIPTS_COUNT][30] = {
-//	  "frozen/frozentest.py"
-//	, "frozen/bm_unpack_sequence.py"
-//	, "frozen/bm_deltablue.py"
-//	, "frozen/bm_fannkuch.py"
-//	, "frozen/bm_hexion.py"
-//	, "frozen/bm_json_dumps.py"
-//	, "frozen/bm_json_loads.py"
-//	, "frozen/bm_meteor_contest.py"
-//	, "frozen/bm_nqueens.py"
-//	, "frozen/bm_pyflate.py"
-//	, "frozen/bm_regex_effbot.py"
-//};
 
 #if MICROPY_ENABLE_GC
 #define HEAP_SIZE_BYTES		5000000
