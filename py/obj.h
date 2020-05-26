@@ -77,6 +77,11 @@ typedef struct _mp_obj_base_t mp_obj_base_t;
 #define MP_OBJ_SENTINEL         (MP_OBJ_FROM_PTR((void*)8))
 #endif
 
+#if defined(__cpu0__)
+#define MP_OBJ_REM(l, r) (MP_OBJ_REM_helper(l, r))
+size_t MP_OBJ_REM_helper(mp_uint_t l, size_t r);
+#endif
+
 // These macros/inline functions operate on objects and depend on the
 // particular object representation.  They are used to query, pack and
 // unpack small ints, qstrs and full object pointers.
@@ -85,12 +90,19 @@ typedef struct _mp_obj_base_t mp_obj_base_t;
 
 #if defined(__cpu0__)
 bool MP_OBJ_IS_SMALL_INT(mp_const_obj_t o);
+
+#define MP_OBJ_NEW_SMALL_INT_ORIG(small_int) ((mp_obj_t)((((mp_uint_t)(small_int)) << 1) | 1))
+#define MP_OBJ_NEW_SMALL_INT(small_int) (MP_OBJ_NEW_SMALL_INT_helper((mp_uint_t)(small_int)))
+mp_obj_t MP_OBJ_NEW_SMALL_INT_helper(mp_uint_t small_int);
+
+#define MP_OBJ_SMALL_INT_VALUE(o) (MP_OBJ_SMALL_INT_VALUE_helper((mp_int_t)(o)))
+mp_int_t MP_OBJ_SMALL_INT_VALUE_helper(mp_int_t o);
 #else
 static inline bool MP_OBJ_IS_SMALL_INT(mp_const_obj_t o)
     { return ((((mp_int_t)(o)) & 1) != 0); }
-#endif
-#define MP_OBJ_SMALL_INT_VALUE(o) (((mp_int_t)(o)) >> 1)
 #define MP_OBJ_NEW_SMALL_INT(small_int) ((mp_obj_t)((((mp_uint_t)(small_int)) << 1) | 1))
+#define MP_OBJ_SMALL_INT_VALUE(o) (((mp_int_t)(o)) >> 1)
+#endif
 
 #if defined(__cpu0__)
 bool MP_OBJ_IS_QSTR(mp_const_obj_t o);
@@ -251,7 +263,11 @@ typedef union _mp_rom_obj_t { uint64_t u64; struct { const void *lo, *hi; } u32;
 
 #ifndef MP_ROM_INT
 typedef mp_const_obj_t mp_rom_obj_t;
+#if defined(__cpu0__)
+#define MP_ROM_INT(i) MP_OBJ_NEW_SMALL_INT_ORIG(i)
+#else
 #define MP_ROM_INT(i) MP_OBJ_NEW_SMALL_INT(i)
+#endif
 #define MP_ROM_QSTR(q) MP_OBJ_NEW_QSTR(q)
 #define MP_ROM_PTR(p) (p)
 /* for testing

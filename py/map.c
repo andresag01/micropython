@@ -224,7 +224,11 @@ mp_map_elem_t *mp_map_lookup(mp_map_t *map, mp_obj_t index, mp_map_lookup_kind_t
         hash = MP_OBJ_SMALL_INT_VALUE(mp_unary_op(MP_UNARY_OP_HASH, index));
     }
 
+    #if defined(__cpu0__)
+    size_t pos = MP_OBJ_REM(hash, map->alloc);
+    #else
     size_t pos = hash % map->alloc;
+    #endif
     size_t start_pos = pos;
     mp_map_elem_t *avail_slot = NULL;
     for (;;) {
@@ -286,7 +290,11 @@ mp_map_elem_t *mp_map_lookup(mp_map_t *map, mp_obj_t index, mp_map_lookup_kind_t
                     // not enough room in table, rehash it
                     mp_map_rehash(map);
                     // restart the search for the new element
+#if defined(__cpu0__)
+                    start_pos = pos = MP_OBJ_REM(hash, map->alloc);
+#else
                     start_pos = pos = hash % map->alloc;
+#endif
                 }
             } else {
                 return NULL;

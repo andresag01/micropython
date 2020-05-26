@@ -50,9 +50,16 @@
 */
 
 STATIC size_t mpn_remove_trailing_zeros(mpz_dig_t *oidig, mpz_dig_t *idig) {
-    for (--idig; idig >= oidig && *idig == 0; --idig) {
-    }
-    return idig + 1 - oidig;
+	size_t diff;
+
+	for (diff = idig - oidig; diff > 0; diff--) {
+		idig--;
+		if (*idig == 0) {
+			break;
+		}
+	}
+
+	return diff;
 }
 
 /* compares i with j
@@ -1677,13 +1684,15 @@ size_t mpz_as_str_inpl(const mpz_t *i, unsigned int base, const char *prefix, ch
     do {
         mpz_dig_t *d = dig + ilen;
         mpz_dbl_dig_t a = 0;
+		size_t di;
 
         // compute next remainder
-        while (--d >= dig) {
+		for (di = ilen; di > 0; di--) {
+			--d;
             a = (a << DIG_SIZE) | *d;
             *d = a / base;
             a %= base;
-        }
+		}
 
         // convert to character
         a += '0';

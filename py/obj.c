@@ -94,6 +94,63 @@ __attribute__((naked)) bool MP_OBJ_IS_OBJ(mp_const_obj_t o) {
     "ret                            \n"
     );
 }
+
+__attribute__((naked)) mp_obj_t MP_OBJ_NEW_SMALL_INT_helper(mp_uint_t small_int) {
+    // ((mp_obj_t)((((mp_uint_t)(small_int)) << 1) | 1))
+
+    __asm volatile (
+    "isptr      r1, r0                      \n"
+    "brf        r1, .notNewSmallIntPointer  \n"
+
+    "ldao       r1, r0                      \n"
+    "ldab       r0, r0                      \n"
+    "shli       r1, r1, 1                   \n"
+    "ldc        r2, 1                       \n"
+    "or         r1, r1, r2                  \n"
+    "addb       r0, r0, r1                  \n"
+    "ret                                    \n"
+
+    ".notNewSmallIntPointer:                \n"
+    "shli       r0, r0, 1                   \n"
+    "ldc        r1, 1                       \n"
+    "or         r0, r0, r1                  \n"
+    "ret                                    \n"
+    );
+}
+
+__attribute__((naked)) mp_int_t MP_OBJ_SMALL_INT_VALUE_helper(mp_int_t o) {
+    // (((mp_int_t)(o)) >> 1)
+
+    __asm volatile (
+    "isptr      r1, r0                  \n"
+    "brf        r1, .notSmallIntPointer \n"
+
+    "ldao       r1, r0                  \n"
+    "ldab       r0, r0                  \n"
+    "ldc        r2, 1                   \n"
+    "ashr       r1, r1, r2              \n"
+    "addb       r0, r0, r1              \n"
+    "ret                                \n"
+
+    ".notSmallIntPointer:               \n"
+    "ldc        r1, 1                   \n"
+    "ashr       r0, r0, r1              \n"
+    "ret                                \n"
+    );
+}
+
+__attribute__((naked)) size_t MP_OBJ_REM_helper(mp_uint_t l, size_t r) {
+    __asm volatile (
+    "isptr      r2, r0                  \n"
+    "brf        r2, .notRemPointer      \n"
+
+    "ldao       r0, r0                  \n"
+
+    ".notRemPointer:                    \n"
+    "rems       r0, r0, r1              \n"
+    "ret                                \n"
+    );
+}
 #endif /* __cpu0__ */
 
 mp_obj_type_t *mp_obj_get_type(mp_const_obj_t o_in) {

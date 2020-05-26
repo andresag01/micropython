@@ -17,6 +17,7 @@ void abort(void) __attribute__((noreturn));
 #define IS_POINTER(x)       isPointer((size_t)(x))
 
 bool isPointer(size_t x);
+size_t getPointerOffset(const void *x);
 size_t getPointerByteIndex(const void *x);
 void *clearPointerByteIndex(void *x);
 void *orPointerOffset(void *ptr, uintptr_t tag);

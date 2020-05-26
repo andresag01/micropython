@@ -52,7 +52,11 @@ const mp_print_t mp_sys_stdout_print = {&mp_sys_stdout_obj, mp_stream_write_adap
 STATIC const MP_DEFINE_STR_OBJ(version_obj, "3.4.0");
 
 // version_info - Python language version that this implementation conforms to, as a tuple of ints
+#if defined(__cpu0__)
+#define I(n) MP_OBJ_NEW_SMALL_INT_ORIG(n)
+#else
 #define I(n) MP_OBJ_NEW_SMALL_INT(n)
+#endif
 // TODO: CPython is now at 5-element array, but save 2 els so far...
 STATIC const mp_obj_tuple_t mp_sys_version_info_obj = {{&mp_type_tuple}, 3, {I(3), I(4), I(0)}};
 

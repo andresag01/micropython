@@ -61,6 +61,14 @@ __attribute__((naked)) bool isPointer(size_t x)
     );
 }
 
+__attribute__((naked)) size_t getPointerOffset(const void *p)
+{
+    __asm volatile (
+    "ldao       r0, r0      \n"
+    "ret                    \n"
+    );
+}
+
 __attribute__((naked)) size_t getPointerByteIndex(const void *p)
 {
 	__asm volatile (
