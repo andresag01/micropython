@@ -366,7 +366,15 @@ mp_obj_t mp_binary_op(mp_binary_op_t op, mp_obj_t lhs, mp_obj_t rhs) {
                     if (rhs_val < 0) {
                         // negative shift not allowed
                         mp_raise_ValueError("negative shift count");
-                    } else if (rhs_val >= (mp_int_t)BITS_PER_WORD || lhs_val > (MP_SMALL_INT_MAX >> rhs_val) || lhs_val < (MP_SMALL_INT_MIN >> rhs_val)) {
+                    } else if (rhs_val >= (mp_int_t)BITS_PER_WORD) {
+                        // left-shift will overflow, so use higher precision integer
+                        lhs = mp_obj_new_int_from_ll(lhs_val);
+                        goto generic_binary_op;
+                    } else if (lhs_val > (MP_SMALL_INT_MAX >> rhs_val)) {
+                        // left-shift will overflow, so use higher precision integer
+                        lhs = mp_obj_new_int_from_ll(lhs_val);
+                        goto generic_binary_op;
+                    } else if (lhs_val < (MP_SMALL_INT_MIN >> rhs_val)) {
                         // left-shift will overflow, so use higher precision integer
                         lhs = mp_obj_new_int_from_ll(lhs_val);
                         goto generic_binary_op;

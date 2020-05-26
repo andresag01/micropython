@@ -54,7 +54,7 @@ STATIC size_t mpn_remove_trailing_zeros(mpz_dig_t *oidig, mpz_dig_t *idig) {
 
 	for (diff = idig - oidig; diff > 0; diff--) {
 		idig--;
-		if (*idig == 0) {
+		if (*idig != 0) {
 			break;
 		}
 	}
