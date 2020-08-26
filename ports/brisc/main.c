@@ -31,20 +31,25 @@
 //#define SCRIPT_MODULE_PATH "frozen/bm_pyflate.py"
 //#define SCRIPT_MODULE_PATH "frozen/bm_regex_effbot.py"
 
-#define SCRIPTS_COUNT		    11
+#define xstr(a) str(a)
+#define str(a) #a
+
+//#define SCRIPTS_COUNT		    11
+#define SCRIPTS_COUNT		    1
 #define MAX_SCRIPT_NAME_LENGTH	30
 static const char scripts[SCRIPTS_COUNT][30] = {
-	  "frozen/frozentest.py"
-	, "frozen/bm_unpack_sequence.py"
-	, "frozen/bm_deltablue.py"
-	, "frozen/bm_fannkuch.py"
-	, "frozen/bm_hexion.py"
-	, "frozen/bm_json_dumps.py"
-	, "frozen/bm_json_loads.py"
-	, "frozen/bm_meteor_contest.py"
-	, "frozen/bm_nqueens.py"
-	, "frozen/bm_pyflate.py"
-	, "frozen/bm_regex_effbot.py"
+    SCRIPT_MODULE_PATH
+//	  "frozen/frozentest.py"
+//	, "frozen/bm_unpack_sequence.py"
+//	, "frozen/bm_deltablue.py"
+//	, "frozen/bm_fannkuch.py"
+//	, "frozen/bm_hexion.py"
+//	, "frozen/bm_json_dumps.py"
+//	, "frozen/bm_json_loads.py"
+//	, "frozen/bm_meteor_contest.py"
+//	, "frozen/bm_nqueens.py"
+//	, "frozen/bm_pyflate.py"
+//	, "frozen/bm_regex_effbot.py"
 };
 
 #if MICROPY_ENABLE_GC
@@ -62,23 +67,23 @@ int main(void) {
     gc_init(heap, heap + sizeof(heap));
 #endif /* MICROPY_ENABLE_GC */
 
-	printString("Initializing interpreter...\n");
+	//printString("Initializing interpreter...\n");
     mp_init();
 
 	for (i = 0; i < SCRIPTS_COUNT; i++)
 	{
-		printString("Executing ");
-        printString(scripts[i]);
-        printString("...\n");
+		//printString("Executing ");
+        //printString(scripts[i]);
+        //printString("...\n");
 
 		pyexec_frozen_module(scripts[i]);
 
-		printString("Ending ");
-        printString(scripts[i]);
-        printString("\n\n");
+		//printString("Ending ");
+        //printString(scripts[i]);
+        //printString("\n\n");
 	}
 
-	printString("Deinitializing interpreter...\n");
+	//printString("Deinitializing interpreter...\n");
     mp_deinit();
 
     return 0;
