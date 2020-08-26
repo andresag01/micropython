@@ -30,7 +30,7 @@ def n_queens(queen_count):
             yield vec
 
 def bench_n_queens(queen_count):
-    print(list(n_queens(queen_count)))
+    list(n_queens(queen_count))
 
 QUEEN_COUNT = 6
 bench_n_queens(QUEEN_COUNT)

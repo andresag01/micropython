@@ -45,5 +45,5 @@ def fannkuch(n):
             return max_flips
 
 
-print(fannkuch(DEFAULT_ARG))
+fannkuch(DEFAULT_ARG)
 sys.exit(0)

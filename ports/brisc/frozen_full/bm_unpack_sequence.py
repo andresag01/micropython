@@ -404,7 +404,6 @@ def do_unpacking(loops, to_unpack):
         a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack
-        print(a, b, c, d, e, f, g, h, i, j)
 
 def bench_tuple_unpacking(loops):
     x = tuple(range(10))
