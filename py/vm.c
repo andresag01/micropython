@@ -86,9 +86,77 @@
 #endif
 
 #define PUSH(val) *++sp = (val)
+/*#define PUSH(val)                                   \
+    do {                                            \
+        *++sp = (val);                              \
+	    mp_printf_one(MP_PYTHON_PRINTER, "%s:",     \
+                      (size_t)__func__);            \
+        mp_printf_one(MP_PYTHON_PRINTER, "%d ",     \
+                      __LINE__);                    \
+        mp_printf_one(MP_PYTHON_PRINTER, "BC %02x", \
+                      *ip_copy);                    \
+        mp_printf_one(MP_PYTHON_PRINTER,            \
+                      " PUSH smallint:%d ",         \
+                      MP_OBJ_IS_SMALL_INT(sp[0]));  \
+        if (MP_OBJ_IS_SMALL_INT(sp[0])) {           \
+            mp_printf_one(MP_PYTHON_PRINTER,                \
+                          "int:%d\n",                       \
+                          MP_OBJ_SMALL_INT_VALUE(sp[0]));   \
+        } else {                                            \
+            mp_printf_one(MP_PYTHON_PRINTER,                \
+                          "\n", 0);                         \
+        }                                                   \
+    } while (false)
+*/
 #define POP() (*sp--)
 #define TOP() (*sp)
 #define SET_TOP(val) *sp = (val)
+/*#define SET_TOP(val)                                        \
+    do {                                                    \
+        *sp = (val);                                        \
+	    mp_printf_one(MP_PYTHON_PRINTER, "%s:",     \
+                      (size_t)__func__);            \
+        mp_printf_one(MP_PYTHON_PRINTER, "%d ",     \
+                      __LINE__);                    \
+        mp_printf_one(MP_PYTHON_PRINTER, "BC %02x", \
+                      *ip_copy);                    \
+        mp_printf_one(MP_PYTHON_PRINTER,            \
+                      " SET_TOP smallint:%d ",      \
+                      MP_OBJ_IS_SMALL_INT(sp[0]));  \
+        if (MP_OBJ_IS_SMALL_INT(sp[0])) {           \
+            mp_printf_one(MP_PYTHON_PRINTER,                \
+                          "int:%d\n",                       \
+                          MP_OBJ_SMALL_INT_VALUE(sp[0]));   \
+        } else {                                            \
+            mp_printf_one(MP_PYTHON_PRINTER,                \
+                          "\n", 0);                         \
+        }                                                   \
+    } while (false)
+
+#define PFASTN(index)                               \
+    do {                                                    \
+	    mp_printf_one(MP_PYTHON_PRINTER, "%s:",     \
+                      (size_t)__func__);            \
+        mp_printf_one(MP_PYTHON_PRINTER, "%d ",     \
+                      __LINE__);                    \
+        mp_printf_one(MP_PYTHON_PRINTER, "BC %02x", \
+                      *ip_copy);                    \
+        mp_printf_one(MP_PYTHON_PRINTER,            \
+                      " FASTN smallint:%d ",      \
+                      MP_OBJ_IS_SMALL_INT(fastn[(index)])); \
+        if (MP_OBJ_IS_SMALL_INT(fastn[(index)])) {          \
+            mp_printf_one(MP_PYTHON_PRINTER,                \
+                          "int:%d\n",                       \
+                          MP_OBJ_SMALL_INT_VALUE(fastn[(index)]));   \
+        } else {                                            \
+            mp_printf_one(MP_PYTHON_PRINTER,                \
+                          "\n", 0);                         \
+        }                                                   \
+    } while (false)
+*/
+#define PFASTN(index)
+#define PPOP()
+#define PTOP()
 
 #if MICROPY_PY_SYS_EXC_INFO
 #define CLEAR_SYS_EXC_INFO() MP_STATE_VM(cur_exception) = NULL;
@@ -170,6 +238,8 @@ run_code_state: ;
     volatile int gil_divisor = MICROPY_PY_THREAD_GIL_VM_DIVISOR;
     #endif
 
+    //const byte *ip_copy = NULL;
+
     // outer exception handling loop
     for (;;) {
         nlr_buf_t nlr;
@@ -177,6 +247,7 @@ outer_dispatch_loop:
         if (nlr_push(&nlr) == 0) {
             // local variables that are not visible to the exception handler
             const byte *ip = code_state->ip;
+            //ip_copy = code_state->ip;
             mp_obj_t *sp = code_state->sp;
             mp_obj_t obj_shared;
             MICROPY_VM_HOOK_INIT
@@ -247,6 +318,7 @@ dispatch_loop:
 
                 ENTRY(MP_BC_LOAD_FAST_N): {
                     DECODE_UINT;
+                    PFASTN(-unum);
                     obj_shared = fastn[-unum];
                     load_check:
                     if (obj_shared == MP_OBJ_NULL) {
@@ -262,6 +334,7 @@ dispatch_loop:
 
                 ENTRY(MP_BC_LOAD_DEREF): {
                     DECODE_UINT;
+                    PFASTN(-unum);
                     obj_shared = mp_obj_cell_get(fastn[-unum]);
                     goto load_check;
                 }
@@ -393,12 +466,14 @@ dispatch_loop:
                 ENTRY(MP_BC_STORE_FAST_N): {
                     DECODE_UINT;
                     fastn[-unum] = POP();
+                    PFASTN(-unum);
                     DISPATCH();
                 }
 
                 ENTRY(MP_BC_STORE_DEREF): {
                     DECODE_UINT;
                     mp_obj_cell_set(fastn[-unum], POP());
+                    PFASTN(-unum);
                     DISPATCH();
                 }
 
@@ -475,6 +550,7 @@ dispatch_loop:
                         goto local_name_error;
                     }
                     fastn[-unum] = MP_OBJ_NULL;
+                    PFASTN(-unum);
                     DISPATCH();
                 }
 
@@ -485,6 +561,7 @@ dispatch_loop:
                         goto local_name_error;
                     }
                     mp_obj_cell_set(fastn[-unum], MP_OBJ_NULL);
+                    PFASTN(-unum);
                     DISPATCH();
                 }
 
@@ -929,6 +1006,9 @@ unwind_jump:;
                         }
                     }
                     #endif
+                    //mp_printf_one(MP_PYTHON_PRINTER,
+                    //              "Function call to type '%s'\n",
+                    //              (size_t)mp_obj_get_type_str(*sp));
                     SET_TOP(mp_call_function_n_kw(*sp, unum & 0xff, (unum >> 8) & 0xff, sp + 1));
                     DISPATCH();
                 }
@@ -1238,10 +1318,12 @@ yield:
 
                 ENTRY(MP_BC_LOAD_FAST_MULTI):
                     obj_shared = fastn[MP_BC_LOAD_FAST_MULTI - (mp_int_t)ip[-1]];
+                    PFASTN(MP_BC_LOAD_FAST_MULTI - (mp_int_t)ip[-1]);
                     goto load_check;
 
                 ENTRY(MP_BC_STORE_FAST_MULTI):
                     fastn[MP_BC_STORE_FAST_MULTI - (mp_int_t)ip[-1]] = POP();
+                    PFASTN(MP_BC_STORE_FAST_MULTI - (mp_int_t)ip[-1]);
                     DISPATCH();
 
                 ENTRY(MP_BC_UNARY_OP_MULTI):
@@ -1262,18 +1344,25 @@ yield:
 #else
                 ENTRY_DEFAULT:
                     if (ip[-1] < MP_BC_LOAD_CONST_SMALL_INT_MULTI + 64) {
+                        //mp_printf_one(MP_PYTHON_PRINTER, "LOAD_CONST_SMALL_INT\n", 0);
                         PUSH(MP_OBJ_NEW_SMALL_INT((mp_int_t)ip[-1] - MP_BC_LOAD_CONST_SMALL_INT_MULTI - 16));
                         DISPATCH();
                     } else if (ip[-1] < MP_BC_LOAD_FAST_MULTI + 16) {
+                        //mp_printf_one(MP_PYTHON_PRINTER, "LOAD_FAST_MULTI\n", 0);
                         obj_shared = fastn[MP_BC_LOAD_FAST_MULTI - (mp_int_t)ip[-1]];
+                        PFASTN(MP_BC_LOAD_FAST_MULTI - (mp_int_t)ip[-1]);
                         goto load_check;
                     } else if (ip[-1] < MP_BC_STORE_FAST_MULTI + 16) {
+                        //mp_printf_one(MP_PYTHON_PRINTER, "STORE_FAST_MULTI\n", 0);
                         fastn[MP_BC_STORE_FAST_MULTI - (mp_int_t)ip[-1]] = POP();
+                        PFASTN(MP_BC_STORE_FAST_MULTI - (mp_int_t)ip[-1]);
                         DISPATCH();
                     } else if (ip[-1] < MP_BC_UNARY_OP_MULTI + 7) {
+                        //mp_printf_one(MP_PYTHON_PRINTER, "UNARY\n", 0);
                         SET_TOP(mp_unary_op(ip[-1] - MP_BC_UNARY_OP_MULTI, TOP()));
                         DISPATCH();
                     } else if (ip[-1] < MP_BC_BINARY_OP_MULTI + 36) {
+                        //mp_printf_one(MP_PYTHON_PRINTER, "BINARY\n", 0);
                         mp_obj_t rhs = POP();
                         mp_obj_t lhs = TOP();
                         SET_TOP(mp_binary_op(ip[-1] - MP_BC_BINARY_OP_MULTI, lhs, rhs));
@@ -1284,6 +1373,7 @@ yield:
                     mp_obj_t obj = mp_obj_new_exception_msg(&mp_type_NotImplementedError, "byte code not implemented");
                     nlr_pop();
                     fastn[0] = obj;
+                    PFASTN(0);
                     return MP_VM_RETURN_EXCEPTION;
                 }
 
