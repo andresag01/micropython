@@ -23,8 +23,9 @@ __attribute__((naked)) unsigned int nlr_push(nlr_buf_t *nlr) {
 	"stwfi		r1, r0, 40			\n"
 
 	// Store return address
-	"ldab		r1, r1				\n"
-	"ldwfi		r1, r1, 0			\n"
+    "ldc        r2, 1               \n"
+    "neg        r2, r2              \n"
+    "ldw        r1, r1, r2          \n"
 	"stwfi		r1, r0, 8			\n"
 
 	// Jump to nlr_push_tail()

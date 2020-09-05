@@ -2,20 +2,24 @@ CROSS = 1
 
 include ../../py/mkenv.mk
 
-FROZEN_DIR = frozen
+SCRIPTS = bm_json_loads.py
 
-FROZEN_SCRIPTS = $(FROZEN_DIR)/frozentest.py	\
-	$(FROZEN_DIR)/bm_nqueens.py					\
-	$(FROZEN_DIR)/bm_deltablue.py				\
-	$(FROZEN_DIR)/bm_fannkuch.py				\
-	$(FROZEN_DIR)/bm_hexion.py					\
-	$(FROZEN_DIR)/bm_json_dumps.py				\
-	$(FROZEN_DIR)/bm_json_loads.py				\
-	$(FROZEN_DIR)/bm_meteor_contest.py			\
-	$(FROZEN_DIR)/bm_unpack_sequence.py			\
-	$(FROZEN_DIR)/bm_nqueens.py					\
-	$(FROZEN_DIR)/bm_pyflate.py					\
-	$(FROZEN_DIR)/bm_regex_effbot.py
+FROZEN_DIR     = frozen
+FROZEN_FULL    = frozen_full
+FROZEN_SCRIPTS = $(addprefix $(FROZEN_DIR)/,$(SCRIPTS))
+
+#FROZEN_SCRIPTS = $(FROZEN_DIR)/frozentest.py	\
+#	$(FROZEN_DIR)/bm_deltablue.py				\
+#	$(FROZEN_DIR)/bm_fannkuch.py				\
+#	$(FROZEN_DIR)/bm_hexion.py					\
+#	$(FROZEN_DIR)/bm_json_dumps.py				\
+#	$(FROZEN_DIR)/bm_json_loads.py				\
+#	$(FROZEN_DIR)/bm_meteor_contest.py			\
+#	$(FROZEN_DIR)/bm_unpack_sequence.py			\
+#	$(FROZEN_DIR)/bm_nqueens.py					\
+#	$(FROZEN_DIR)/bm_pyflate.py					\
+#	$(FROZEN_DIR)/bm_regex_effbot.py
+
 
 # qstr definitions (must come before including py.mk)
 QSTR_DEFS = qstrdefsport.h
@@ -35,7 +39,8 @@ ENTRY_FUNC = _start
 ARCH = cpu0
 CFLAGS = -O$(OLEVEL) -emit-llvm -nostdlib -target $(ARCH) -ffreestanding \
 		-fno-stack-check -fno-stack-protector $(INC) \
-		-isystem $(SYSROOT_DIR) --sysroot $(SYSROOT_DIR)
+		-isystem $(SYSROOT_DIR) --sysroot $(SYSROOT_DIR) \
+		-DSCRIPT_MODULE_PATH="\"$(SCRIPT_MODULE_PATH)\""
 LFLAGS = -relocation-model=pic -march=$(ARCH) -O$(OLEVEL) -filetype=asm
 AFLAGS = --prog-handle 1       \
 	--handle-bits 15           \
@@ -56,13 +61,21 @@ SRC_C = \
 	stdio.c \
 	lib/utils/stdout_helpers.c \
 	lib/utils/pyexec.c \
-	$(BUILD)/_frozen_mpy.c \
+	$(BUILD)/_frozen_mpy.c
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/,$(SRC_C:.c=.o))
 
 all: $(BUILD)/firmware.elf
 
-%.mpy: %.py
+$(FROZEN_DIR):
+	$(Q)mkdir $@
+
+$(FROZEN_DIR)/%.py: $(FROZEN_FULL)/%.py $(FROZEN_DIR)
+	$(Q)cp $< $@
+
+.PRECIOUS: %.py
+
+$(FROZEN_DIR)/%.mpy: $(FROZEN_DIR)/%.py
 	$(ECHO) "MPC $<"
 	$(Q)$(TOP)/mpy-cross/mpy-cross -X emit=bytecode -o $@ $<
 
@@ -74,8 +87,11 @@ $(BUILD)/firmware.elf: $(OBJ) startup.asm
 	$(ECHO) "LD $@"
 	$(Q)$(ASM)  --output $@ --disassemble $(@:.elf=.disasm) --input $^ $(AFLAGS)
 
+clean_scripts:
+	$(RM) -rf $(FROZEN_DIR)
+
 spotless:
 	$(MAKE) clean
-	$(RM) -f $(FROZEN_SCRIPTS:.py=.mpy)
+	$(MAKE) clean_scripts
 
 include $(TOP)/py/mkrules.mk

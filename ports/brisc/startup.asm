@@ -5,6 +5,7 @@
 _start:
         ; Initialize the stack
         newmwi r0, 4
+        ldawfi r0, r0, 4
         setwp r0
 
 		; Set the compatibility flag for the current mode (PANIC)
